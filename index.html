@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>HK School Timetable Assistant</title>
+<style>
+  :root{
+    --bg:#0f172a;
+    --panel:#111827;
+    --muted:#94a3b8;
+    --ok:#22c55e;
+    --warn:#f59e0b;
+    --danger:#ef4444;
+    --accent:#38bdf8;
+  }
+  html,body{height:100%; margin:0; overflow:hidden}
+  body{
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    background:linear-gradient(180deg,#0b1220,#0f172a);
+    color:#e5e7eb; min-height:100vh; display:flex; flex-direction:column;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    box-sizing:border-box;
+  }
+  .app{
+    width:100%; height:100%; max-width:100%; margin:0; background:#0b1220cc; backdrop-filter:blur(6px);
+    border-radius:14px; padding:20px; display:flex; flex-direction:column; box-sizing:border-box;
+    transition: all 0.3s ease;
+  }
+  header{
+    display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    margin-bottom:16px; background:#0b1220cc; backdrop-filter:blur(6px); padding-top:8px;
+  }
+  header h1{font-size:1.4rem; margin:0; font-weight:600}
+  .controls{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+  select,button{
+    background:#0b1220; color:#e5e7eb; border:1px solid #334155; border-radius:10px;
+    padding:10px 16px; font-size:16px; touch-action:manipulation;
+  }
+  button:active{background:#334155}
+  .grid{display:grid; grid-template-columns:1fr; gap:16px; flex:1}
+  @media (min-width:800px){ .grid{grid-template-columns:repeat(3,1fr)} }
+  .card{
+    background:#0b1220; border:1px solid #1f2937; border-radius:12px; padding:18px;
+  }
+  .label{color:var(--muted); font-size:14px; letter-spacing:.04em; text-transform:uppercase; margin-bottom:6px}
+  .value{font-size:20px; font-weight:600}
+  .countdown{font-variant-numeric:tabular-nums; font-size:56px; font-weight:800; line-height:1}
+  .pill{display:inline-block; padding:6px 12px; border-radius:999px; font-size:14px; border:1px solid #334155}
+  .now{color:#22c55e}
+  table{width:100%; border-collapse:collapse; font-size:15px; margin-top:10px}
+  th,td{border-bottom:1px solid #1f2937; padding:10px 6px}
+  th{color:#94a3b8; text-align:left; font-weight:600; font-size:13px}
+  .time{color:#a5b4fc; white-space:nowrap}
+  .subject{font-weight:600}
+  .small{font-size:13px}
+  .row{display:flex; gap:16px; align-items:center; flex-wrap:wrap}
+  .flexcol{display:flex; flex-direction:column; gap:8px}
+  .content{flex:1; display:flex; flex-direction:column; overflow:hidden}
+  .schedule-card{flex:none; display:flex; flex-direction:column; margin-top:20px; max-height:40vh}
+  .schedule-card > div:first-child{margin-bottom:10px}
+  .schedule-card > div:last-child{flex:1; overflow:auto}
+
+  /* Fullscreen Mode - Full bleed, perfect for iPad */
+  .fullscreen{
+    position:fixed; inset:0; margin:0; padding:env(safe-area-inset-top) 30px env(safe-area-inset-bottom) 30px;
+    border-radius:0; background:#0b1220; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; box-sizing:border-box; overflow:hidden;
+  }
+  .fs-clock{font-size:40px; margin-bottom:30px; color:var(--accent); font-weight:600}
+  .fs-countdown{
+    font-size:140px; font-weight:900; line-height:1; margin:30px 0;
+    font-variant-numeric:tabular-nums; text-align:center;
+  }
+  .fs-info{
+    text-align:center; font-size:28px; margin:20px 0; max-width:90%; line-height:1.5;
+  }
+  .fs-info strong{color:var(--accent)}
+  .fs-button{
+    position:absolute; top:calc(env(safe-area-inset-top) + 15px); right:20px;
+    padding:14px 28px; font-size:20px; background:#334155; border:1px solid #64748b;
+    border-radius:12px; touch-action:manipulation;
+  }
+  .fs-button:active{background:#475569}
+</style>
+</head>
+<body>
+  <div class="app" id="app">
+    <header>
+      <h1>Timetable Assistant (HK Time)</h1>
+      <div class="controls">
+        <span class="pill">Current: <span id="clock" style="margin-left:8px"></span></span>
+        <select id="dayPicker">
+          <option value="1">Day 1</option>
+          <option value="2">Day 2</option>
+          <option value="3">Day 3</option>
+          <option value="4">Day 4</option>
+          <option value="5">Day 5</option>
+          <option value="6">Day 6</option>
+        </select>
+        <button id="setDayBtn">Set Day</button>
+        <button id="fullscreenBtn">Fullscreen Countdown</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="grid">
+        <div class="card">
+          <div class="row">
+            <div class="flexcol" style="flex:1">
+              <span class="label">Current</span>
+              <div id="nowStatus" class="value">Loading…</div>
+              <div id="nowDetail" class="small muted"></div>
+            </div>
+            <div class="flexcol" style="text-align:right">
+              <span class="label">Time Remaining</span>
+              <div id="countdown" class="countdown">--:--</div>
+              <div id="doubleLesson" class="small pill success" style="display:none; margin-top:10px"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="label">Next Event</span>
+          <div id="nextEvent" class="value">—</div>
+          <div id="nextEventTime" class="small muted">—</div>
+        </div>
+
+        <div class="card">
+          <span class="label">Next Lesson</span>
+          <div id="nextLesson" class="value">—</div>
+          <div id="nextLessonTime" class="small muted">—</div>
+        </div>
+      </div>
+
+      <div class="card schedule-card">
+        <div class="row" style="justify-content:space-between">
+          <div class="label">Today’s Schedule</div>
+          <div class="pill" id="activeDayPill">Day 1</div>
+        </div>
+        <div>
+          <table id="scheduleTable">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Activity</th>
+                <th>Room / Notes</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const tz = 'Asia/Hong_Kong';
+function nowHK() { return new Date(new Date().toLocaleString('en-US', { timeZone: tz })); }
+function parseHM(hm){
+  const n = nowHK();
+  const [h,m] = hm.split(':').map(Number);
+  return new Date(n.getFullYear(), n.getMonth(), n.getDate(), h, m);
+}
+function diffFmt(ms){
+  if(ms <= 0) return '00:00';
+  const s = Math.floor(ms/1000);
+  const m = Math.floor(s/60);
+  const sec = s % 60;
+  const mm = m % 60;
+  return `${mm.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
+}
+function between(t, a, b){ return t >= a && t < b; }
+
+const periods = [
+  {start:"08:00",end:"08:20",display:"Morning Devotion",type:"event"},
+  {start:"08:20",end:"08:55",display:"Period 1",type:"class",
+    day1:"Mathematics WSY 306", day2:"Chinese Language WKY 306", day3:"Citizenship, Economics and Society CCC 306",
+    day4:"English Language WMC/LTL/MSS/WJW 301/306/305/101", day5:"Music TYL 311", day6:"Physics CSM 409"},
+  {start:"08:55",end:"09:30",display:"Period 2",type:"class",
+    day1:"Mathematics WSY 306", day2:"Chinese Language WKY 306", day3:"Citizenship, Economics and Society CCC 306",
+    day4:"English Language WMC/LTL/MSS/WJW 301/306/305/101", day5:"Music TYL 311", day6:"Physics CSM 409"},
+  {start:"09:30",end:"09:50",display:"Recess",type:"event"},
+  {start:"09:50",end:"10:25",display:"Period 3",type:"class",
+    day1:"Physics CSM 409", day2:"English Language WMC/LTL/MSS/WJW 301/306/305/101", day3:"Chinese Language WKY 306",
+    day4:"Home Economics SWS 209", day5:"Mathematics WSY 306", day6:"English Language WMC/LTL/MSS/WJW 301/306/305/101"},
+  {start:"10:25",end:"11:00",display:"Period 4",type:"class",
+    day1:"Physics CSM 409", day2:"English Language WMC/LTL/MSS/WJW 301/306/305/101", day3:"Chinese Language WKY 306",
+    day4:"Home Economics SWS 209", day5:"Mathematics WSY 306", day6:"English Language WMC/LTL/MSS/WJW 301/306/305/101"},
+  {start:"11:00",end:"11:15",display:"Recess",type:"event"},
+  {start:"11:15",end:"11:35",display:"Reading time",type:"event"},
+  {start:"11:35",end:"12:10",display:"Period 5",type:"class",
+    day1:"Computer Literacy CYS 705", day2:"Ethics/Religious Education LCY 306", day3:"Assembly WSY,CCC 306",
+    day4:"Visual Arts WHH 209", day5:"History WLH 306", day6:"Mathematics WSY 306"},
+  {start:"12:10",end:"12:45",display:"Period 6",type:"class",
+    day1:"Computer Literacy CYS 705", day2:"History WLH 306", day3:"Assembly WSY,CCC 306",
+    day4:"Visual Arts WHH 209", day5:"History WLH 306", day6:"Mathematics WSY 306"},
+  {start:"12:45",end:"13:50",display:"Lunch",type:"event"},
+  {start:"13:55",end:"14:30",display:"Period 7",type:"class",
+    day1:"Chinese Language WKY 306", day2:"Mathematics WSY 306", day3:"Mathematics WSY 306",
+    day4:"Mathematics WSY 306", day5:"Computer Literacy CYS 702", day6:"Putonghua YD 306"},
+  {start:"14:30",end:"15:05",display:"Period 8",type:"class",
+    day1:"History WLH 306", day2:"Physical Education Lessons CYT,YCK PG", day3:"Physics CSM 409",
+    day4:"Chinese Language WKY 306", day5:"English Language WMC/LTL/MSS/WJW 301/306/305/101", day6:"Chinese Language WKY 306"},
+  {start:"15:05",end:"15:40",display:"Period 9",type:"class",
+    day1:"History WLH 306", day2:"Physical Education Lessons CYT,YCK PG", day3:"Physics CSM 409",
+    day4:"Chinese Language WKY 306", day5:"English Language WMC/LTL/MSS/WJW 301/306/305/101", day6:"Chinese Language WKY 306"},
+];
+
+let currentDay = 1;
+let isFullscreen = false;
+const app = document.getElementById('app');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+const originalContent = app.innerHTML;
+
+function enterFullscreen(){
+  isFullscreen = true;
+  app.classList.add('fullscreen');
+  fullscreenBtn.textContent = "Exit Fullscreen";
+  renderFullscreen();
+}
+
+function exitFullscreen(){
+  isFullscreen = false;
+  app.classList.remove('fullscreen');
+  fullscreenBtn.textContent = "Fullscreen Countdown";
+  app.innerHTML = originalContent;
+  document.getElementById('setDayBtn').onclick = setDay;
+  document.getElementById('dayPicker').onchange = changeDay;
+  document.getElementById('fullscreenBtn').onclick = enterFullscreen;
+  renderAll();
+}
+
+fullscreenBtn.onclick = enterFullscreen;
+
+function setDay(){ currentDay = Number(document.getElementById('dayPicker').value); renderAll(); }
+function changeDay(e){ currentDay = Number(e.target.value); renderAll(); }
+document.getElementById('setDayBtn').onclick = setDay;
+document.getElementById('dayPicker').onchange = changeDay;
+
+function getDaySchedule(day){
+  return periods.map(p => {
+    const subject = p.type === "class" ? p[`day${day}`] || "" : "";
+    return { start: parseHM(p.start), end: parseHM(p.end), rawStart: p.start, rawEnd: p.end, display: p.display, type: p.type, subject };
+  });
+}
+
+function populateTable(day){
+  const tbody = document.getElementById('scheduleBody');
+  tbody.innerHTML = '';
+  getDaySchedule(day).forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="time">${r.rawStart}–${r.rawEnd}</td>
+      <td class="subject">${r.type === "class" ? r.subject : r.display}</td>
+      <td class="small muted">${r.type === "class" ? r.subject.split(' ').slice(-2).join(' ') : ''}</td>`;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('activeDayPill').textContent = `Day ${day}`;
+}
+
+function analyze(day){
+  const schedule = getDaySchedule(day);
+  const t = nowHK();
+  const nowIdx = schedule.findIndex(p => between(t, p.start, p.end));
+  let current = null, nextEvent = null, nextLesson = null, countdownTo = null, doubleInfo = null;
+  if(nowIdx !== -1){
+    current = schedule[nowIdx]; countdownTo = current.end;
+    if(current.type === "class"){
+      if(schedule[nowIdx+1]?.type === "class" && schedule[nowIdx+1].subject === current.subject) doubleInfo = {second: schedule[nowIdx+1]};
+    }
+    nextEvent = schedule.slice(nowIdx+1).find(p => p.type === "event");
+    nextLesson = schedule.slice(nowIdx+1).find(p => p.type === "class");
+  } else {
+    nextEvent = schedule.find(p => p.start > t && p.type === "event");
+    nextLesson = schedule.find(p => p.start > t && p.type === "class");
+    countdownTo = nextEvent ? nextEvent.start : (nextLesson ? nextLesson.start : null);
+  }
+  return { current, nextEvent, nextLesson, countdownTo, doubleInfo };
+}
+
+function renderAll(){ populateTable(currentDay); updateInfo(); }
+
+function updateInfo(){
+  const { current, nextEvent, nextLesson, countdownTo, doubleInfo } = analyze(currentDay);
+  const t = nowHK();
+
+  document.getElementById('nowStatus').innerHTML = current
+    ? (current.type === "class" ? `<span class="now">${current.subject}</span>` : `<span class="pill">${current.display}</span>`)
+    : `<span class="muted">No active period</span>`;
+  document.getElementById('nowDetail').textContent = current ? `${current.rawStart}–${current.rawEnd}` : 'School finished – can go home!';
+
+  document.getElementById('nextEvent').textContent = nextEvent ? nextEvent.display : '—';
+  document.getElementById('nextEventTime').textContent = nextEvent ? `${nextEvent.rawStart}–${nextEvent.rawEnd}` : 'No more events today';
+
+  document.getElementById('nextLesson').textContent = nextLesson ? nextLesson.subject : '—';
+  document.getElementById('nextLessonTime').textContent = nextLesson ? `${nextLesson.rawStart}–${nextLesson.rawEnd}` : 'No more lessons today';
+
+  const dbl = document.getElementById('doubleLesson');
+  dbl.style.display = doubleInfo?.second ? 'inline-block' : 'none';
+  if(doubleInfo?.second) dbl.textContent = `Double → ${doubleInfo.second.subject} (${doubleInfo.second.rawStart}–${doubleInfo.second.rawEnd})`;
+
+  const cd = document.getElementById('countdown');
+  if(countdownTo){
+    cd.textContent = diffFmt(countdownTo - t);
+    cd.style.color = current ? 'var(--ok)' : 'var(--warn)';
+  } else {
+    cd.textContent = '--:--';
+    cd.style.color = 'var(--danger)';
+  }
+}
+
+function renderFullscreen(){
+  const { current, nextEvent, nextLesson, countdownTo } = analyze(currentDay);
+  const t = nowHK();
+  const timeStr = t.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+
+  const currentText = current ? (current.type === "class" ? current.subject : current.display) : "No active period";
+
+  app.innerHTML = `
+    <button class="fs-button" id="fsExitBtn">Exit</button>
+    <div class="fs-clock" id="fsClock">${timeStr}</div>
+    <div class="fs-countdown" id="fsCountdown">--:--</div>
+    <div class="fs-info">Now: <strong>${currentText}</strong></div>
+    ${nextLesson ? `<div class="fs-info">Next Lesson: <strong>${nextLesson.subject}</strong><br>${nextLesson.rawStart}–${nextLesson.rawEnd}</div>` : '<div class="fs-info">No more lessons</div>'}
+    ${nextEvent ? `<div class="fs-info">Next Event: <strong>${nextEvent.display}</strong><br>${nextEvent.rawStart}–${nextEvent.rawEnd}</div>` : '<div class="fs-info">No more events</div>'}
+  `;
+
+  document.getElementById('fsExitBtn').onclick = exitFullscreen;
+
+  const fsCd = document.getElementById('fsCountdown');
+  if(countdownTo){
+    fsCd.textContent = diffFmt(countdownTo - t);
+    fsCd.style.color = current ? 'var(--ok)' : 'var(--warn)';
+  } else {
+    fsCd.textContent = '00:00';
+    fsCd.style.color = 'var(--danger)';
+  }
+}
+
+function tick(){
+  const t = nowHK();
+  const clockStr = t.toLocaleString('en-US', { weekday:'short', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  if(!isFullscreen && document.getElementById('clock')) document.getElementById('clock').textContent = clockStr;
+
+  if(isFullscreen){
+    renderFullscreen();
+  } else {
+    updateInfo();
+  }
+}
+
+// Optimised update: only every 5 seconds for non-critical parts in normal mode
+let lastFullUpdate = 0;
+function optimisedTick(){
+  const now = Date.now();
+  tick(); // always update countdown & clock
+  if(now - lastFullUpdate > 5000){ // full analysis only every 5s (reduces lag)
+    if(!isFullscreen) renderAll();
+    lastFullUpdate = now;
+  }
+}
+
+renderAll();
+setInterval(optimisedTick, 1000);
+</script>
+</body>
+</html>
