@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext x='16' y='22' font-family='Arial Black, sans-serif' font-size='20' font-weight='bold' text-anchor='middle' fill='%23000000'%3EZZZ%3C/text%3E%3C/svg%3E">
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Lesson Timer (Auto Day)</title>
+<title>Lesson Timer (Clear Tomorrow)</title>
 <style>
   :root{
     --bg:#0f172a; --panel:#111827; --muted:#94a3b8;
@@ -36,7 +36,6 @@
   header h1{font-size:1.4rem; margin:0; font-weight:600}
   .controls{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
   
-  /* Settings Panel */
   #settingsPanel {
     display:none; 
     flex-direction:column; gap:12px;
@@ -53,25 +52,15 @@
   button:active{background:#334155}
   
   .primary-btn { background: var(--accent); color: #0f172a; font-weight: bold; border:none; }
-  .primary-btn:active { background: #0ea5e9; }
   .danger-btn { background: #7f1d1d; color: #fecaca; border:1px solid #991b1b; }
 
   /* New Auto Button Styles */
   #autoSetBtn {
-    background-color: var(--ok);
-    color: #052e16;
-    font-weight: bold;
-    border: none;
-    width: 100%;
-    margin-bottom: 8px;
-    transition: background-color 0.3s, color 0.3s;
+    background-color: var(--ok); color: #052e16; font-weight: bold;
+    border: none; width: 100%; margin-bottom: 8px; transition: 0.3s;
   }
-  /* When Auto Mode is TRUE, button looks disabled (Gray) */
   #autoSetBtn.active-auto {
-    background-color: #475569; /* Gray */
-    color: #94a3b8;
-    cursor: default;
-    pointer-events: none; /* Can't click */
+    background-color: #475569; color: #94a3b8; cursor: default; pointer-events: none;
   }
 
   .sync-group { display:flex; align-items:center; justify-content: space-between; gap:4px; }
@@ -110,6 +99,10 @@
 
   .pill{display:inline-block; padding:6px 12px; border-radius:999px; font-size:14px; border:1px solid #334155}
   
+  /* TOMORROW MODE STYLES */
+  .tomorrow-mode-text { color: var(--warn) !important; font-weight: bold; }
+  .tomorrow-pill { border-color: var(--warn) !important; color: var(--warn) !important; }
+
   .status-break { color: var(--break-color); font-weight: 700; }
   .status-warn { color: var(--danger); animation: pulse 1s infinite; }
   @keyframes pulse { 0%{opacity:1} 50%{opacity:0.8} 100%{opacity:1} }
@@ -146,72 +139,20 @@
   }
   #fullscreenLayer.active { display:flex; }
 
-  .fs-section-top {
-    flex: 65; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
-
-  .fs-section-bottom {
-    flex: 35; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding-top: 10px;
-    gap: 30px;
-  }
-
-  .fs-row {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    width: 100%;
-  }
+  .fs-section-top { flex: 65; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+  .fs-section-bottom { flex: 35; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 10px; gap: 30px; }
+  .fs-row { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%; }
   
-  .fs-clock {
-    position: absolute; top: 10px; left: 10px;
-    font-size: 18px; color: #64748b; font-weight: 500;
-  }
-
-  .fs-countdown { 
-    font-size: 28vh; 
-    font-weight:900; 
-    line-height:1; 
-    font-variant-numeric:tabular-nums; 
-    text-align:center; 
-  }
-
+  .fs-clock { position: absolute; top: 10px; left: 10px; font-size: 18px; color: #64748b; font-weight: 500; }
+  .fs-countdown { font-size: 28vh; font-weight:900; line-height:1; font-variant-numeric:tabular-nums; text-align:center; }
   .fs-info-label { font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px;}
   
-  .fs-info-main { 
-    font-size: 28px; 
-    font-weight: 700; 
-    line-height: 1.1; 
-    overflow: hidden; 
-    white-space: nowrap; 
-    text-overflow: ellipsis; 
-    max-width: 90%; 
-  }
-  
+  .fs-info-main { font-size: 28px; font-weight: 700; line-height: 1.1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 90%; }
   .fs-info-sub { font-size: 20px; color: var(--muted); margin-top: 2px; }
   
-  .fs-button{
-    position:absolute; top:10px; right:10px;
-    padding:8px 16px; font-size:16px; background:#334155; border:1px solid #64748b;
-    border-radius:8px; touch-action:manipulation; cursor: pointer; z-index: 100;
-  }
+  .fs-button{ position:absolute; top:10px; right:10px; padding:8px 16px; font-size:16px; background:#334155; border:1px solid #64748b; border-radius:8px; cursor: pointer; z-index: 100; }
   
-  #testModeBadge {
-    display: none; background: #ef4444; color: white; padding: 2px 8px; 
-    border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 8px;
-    vertical-align: middle; text-transform: uppercase;
-  }
+  #testModeBadge { display: none; background: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 8px; vertical-align: middle; text-transform: uppercase; }
 </style>
 </head>
 <body>
@@ -235,7 +176,6 @@
         <button id="fullscreenBtn">Fullscreen</button>
 
         <div id="settingsPanel">
-            
             <div style="font-size:12px; color:#22c55e; margin-bottom:4px">Calendar Automation</div>
             <button id="autoSetBtn" onclick="activateAutoMode()">✨ Auto Set Day</button>
             <div style="border-top:1px solid #334155; margin-bottom:12px"></div>
@@ -276,7 +216,7 @@
         <div class="card" id="mainCard">
           <div class="header-card-layout">
             <div class="flexcol" style="min-width: 0;"> 
-              <span class="label">Current</span>
+              <span class="label" id="mainStatusLabel">Current</span>
               <div id="nowStatus" class="value">Loading…</div>
               <div id="nowDetail" class="small muted"></div>
             </div>
@@ -303,7 +243,7 @@
 
       <div class="card schedule-card">
         <div class="row" style="justify-content:space-between">
-          <div class="label">Today’s Schedule <span id="editIndicator" style="color:var(--warn); display:none">(Editing)</span></div>
+          <div class="label" id="scheduleLabel">Today’s Schedule <span id="editIndicator" style="color:var(--warn); display:none">(Editing)</span></div>
           <div class="pill" id="activeDayPill">Day 1</div>
         </div>
         <div>
@@ -330,7 +270,7 @@
 
      <div class="fs-section-bottom">
         <div class="fs-row" id="fsCurrentBlock">
-           <div class="fs-info-label">Now</div>
+           <div class="fs-info-label" id="fsCurrentLabel">Now</div>
            <div class="fs-info-main" id="fsCurrentSubject">...</div>
            <div class="fs-info-sub" id="fsCurrentTime">...</div>
         </div>
@@ -382,7 +322,6 @@ const defaultPeriods = [
    day4:"Chinese Language", day5:"English Language", day6:"Chinese Language"},
 ];
 
-// --- CALENDAR DATA (Formatted from your provided list) ---
 const calendarData = {
 "2025-9-2":1,"2025-9-3":2,"2025-9-4":3,"2025-9-5":4,"2025-9-8":5,"2025-9-9":6,"2025-9-10":1,"2025-9-11":2,"2025-9-12":3,"2025-9-15":4,"2025-9-16":5,"2025-9-17":6,"2025-9-18":1,"2025-9-19":2,"2025-9-22":3,"2025-9-23":4,"2025-9-24":5,"2025-9-25":6,"2025-9-29":1,"2025-9-30":2,
 "2025-10-6":3,"2025-10-8":4,"2025-10-9":5,"2025-10-10":6,"2025-10-13":1,"2025-10-14":2,"2025-10-15":3,"2025-10-16":4,"2025-10-17":5,"2025-10-20":6,"2025-10-21":1,"2025-10-22":2,"2025-10-23":3,"2025-10-28":4,"2025-10-30":5,"2025-10-31":6,
@@ -399,30 +338,30 @@ const calendarData = {
 
 let periods = JSON.parse(localStorage.getItem('lessonTimer_data') || JSON.stringify(defaultPeriods));
 const savedOffset = localStorage.getItem('lessonTimer_offset');
-let timeOffset = savedOffset !== null 
-    ? parseInt(savedOffset, 10) 
-    : (DEFAULT_CLOCK_OFFSET_SECONDS * 1000);
+let timeOffset = savedOffset !== null ? parseInt(savedOffset, 10) : (DEFAULT_CLOCK_OFFSET_SECONDS * 1000);
 
 let currentDay = parseInt(localStorage.getItem('lessonTimer_day') || '1');
 let isEditMode = false;
 let isFullscreen = false;
 let testModeOffset = null; 
+let isTomorrowView = false; 
 
-// --- IS AUTO MODE ---
-let isAutoMode = localStorage.getItem('lessonTimer_isAuto') === 'true';
+// DEFAULT: TRUE (If null, it means new user or reset, so TRUE)
+const storedAuto = localStorage.getItem('lessonTimer_isAuto');
+let isAutoMode = storedAuto === null ? true : (storedAuto === 'true');
 
 const app = document.getElementById('normalView');
 const fsLayer = document.getElementById('fullscreenLayer');
 const settingsPanel = document.getElementById('settingsPanel');
 const dayPicker = document.getElementById('dayPicker');
 const autoBtn = document.getElementById('autoSetBtn');
+const pill = document.getElementById('activeDayPill');
 
 // Initial Setup
 dayPicker.value = currentDay;
 updateOffsetDisplay();
 updateAutoButtonUI();
 
-// If page loads and we were in auto mode, re-run logic
 if (isAutoMode) {
     activateAutoMode();
 }
@@ -440,12 +379,10 @@ function nowHK() {
   return real;
 }
 
-// --- NEW FUNCTION: ACTIVATE AUTO MODE ---
+// --- AUTO MODE LOGIC ---
 function activateAutoMode() {
     isAutoMode = true;
     localStorage.setItem('lessonTimer_isAuto', 'true');
-    
-    // Check Date Immediately
     checkAutoDate();
     updateAutoButtonUI();
 }
@@ -453,10 +390,19 @@ function activateAutoMode() {
 function checkAutoDate() {
     if(!isAutoMode) return;
 
-    const t = nowHK();
-    // Key format: YYYY-M-D (No leading zeros for month/day)
-    const key = `${t.getFullYear()}-${t.getMonth() + 1}-${t.getDate()}`;
-    
+    let t = nowHK();
+    let useDate = t;
+    isTomorrowView = false;
+
+    // --- CHECK TIME: If after 15:40 (3:40 PM), use TOMORROW'S date ---
+    if (t.getHours() > 15 || (t.getHours() === 15 && t.getMinutes() >= 40)) {
+        useDate = new Date(t);
+        useDate.setDate(t.getDate() + 1);
+        isTomorrowView = true;
+    }
+
+    // Key format: YYYY-M-D
+    const key = `${useDate.getFullYear()}-${useDate.getMonth() + 1}-${useDate.getDate()}`;
     const autoDay = calendarData[key];
 
     if (autoDay) {
@@ -465,6 +411,11 @@ function checkAutoDate() {
         localStorage.setItem('lessonTimer_day', currentDay);
         populateTable(currentDay);
         updateInfo();
+    } else {
+        // If data missing for tomorrow, fallback to today to avoid broken UI
+        if(isTomorrowView && !autoDay) {
+             isTomorrowView = false; 
+        }
     }
 }
 
@@ -472,7 +423,6 @@ function updateAutoButtonUI() {
     if (isAutoMode) {
         autoBtn.classList.add('active-auto');
         autoBtn.textContent = "Auto Mode Active (Day Locked)";
-        // We do NOT disable the select, so user can still change it manually to break the lock
     } else {
         autoBtn.classList.remove('active-auto');
         autoBtn.textContent = "✨ Auto Set Day";
@@ -497,8 +447,6 @@ function enableTestMode() {
     testModeOffset = targetTime.getTime() - realNow.getTime();
     document.getElementById('testModeBadge').style.display = 'inline';
     document.getElementById('resetTestBtn').style.display = 'block';
-    
-    // Check auto again if we travel in time
     if(isAutoMode) checkAutoDate();
     optimisedTick(true);
 }
@@ -508,7 +456,6 @@ function disableTestMode() {
     document.getElementById('testModeBadge').style.display = 'none';
     document.getElementById('resetTestBtn').style.display = 'none';
     document.getElementById('testTimeInput').value = '';
-    // Check auto again if we return to real time
     if(isAutoMode) checkAutoDate();
     optimisedTick(true);
 }
@@ -548,40 +495,25 @@ function getDaySchedule(day){
 
 function getCombinedLesson(period, schedule) {
     if (!period || period.type !== 'class') return period;
-
     let combined = { ...period };
     let isConnected = false;
-
-    // Backward check
     let backIdx = period.index - 1;
     while(backIdx >= 0) {
         let prev = schedule[backIdx];
         if(prev.subject === combined.subject && prev.end.getTime() === combined.start.getTime()){
-            combined.start = prev.start;
-            combined.rawStart = prev.rawStart; 
-            isConnected = true;
-            backIdx--;
-        } else {
-            break;
-        }
+            combined.start = prev.start; combined.rawStart = prev.rawStart; 
+            isConnected = true; backIdx--;
+        } else break;
     }
-
-    // Forward check
     let fwdIdx = period.index + 1;
     let activeEndTime = combined.end;
     while(fwdIdx < schedule.length) {
         let next = schedule[fwdIdx];
         if(next.subject === combined.subject && next.start.getTime() === activeEndTime.getTime()){
-            activeEndTime = next.end;
-            combined.end = activeEndTime;
-            combined.rawEnd = next.rawEnd; 
-            isConnected = true;
-            fwdIdx++;
-        } else {
-            break;
-        }
+            activeEndTime = next.end; combined.end = activeEndTime; combined.rawEnd = next.rawEnd; 
+            isConnected = true; fwdIdx++;
+        } else break;
     }
-    
     if(isConnected) combined.isDouble = true;
     return combined;
 }
@@ -628,21 +560,18 @@ function saveFromTable(){
 
 function resetData(){
     if(confirm("Reset all subjects and return settings to default?")){
-        localStorage.removeItem('lessonTimer_data');
-        localStorage.removeItem('lessonTimer_offset');
-        localStorage.removeItem('lessonTimer_isAuto'); 
-        location.reload();
+        localStorage.clear(); 
+        location.reload(); 
     }
 }
 
-// --- MANUAL CHANGE DISABLES AUTO MODE ---
 function setDay(){ 
   if(isEditMode) saveFromTable();
   
-  // Disable Auto Mode if user changes manually
   if (isAutoMode) {
       isAutoMode = false;
       localStorage.setItem('lessonTimer_isAuto', 'false');
+      isTomorrowView = false; 
       updateAutoButtonUI();
   }
 
@@ -667,12 +596,25 @@ function populateTable(day){
     }
     tbody.appendChild(tr);
   });
-  document.getElementById('activeDayPill').textContent = `Day ${day}`;
+  
+  // --- PILL UPDATE LOGIC ---
+  const pillText = `Day ${day}`;
+  if(isTomorrowView) {
+      pill.innerHTML = `⚠️ ${pillText} (Tomorrow)`;
+      pill.classList.add('tomorrow-pill');
+  } else {
+      pill.textContent = pillText;
+      pill.classList.remove('tomorrow-pill');
+  }
 }
 
 function between(t, a, b){ return t >= a && t < b; }
 
 function analyze(day){
+  if(isTomorrowView) {
+      return { current: null, nextEvent: null, nextLesson: null, countdownTo: null };
+  }
+
   const schedule = getDaySchedule(day);
   const t = nowHK();
   const nowIdx = schedule.findIndex(p => between(t, p.start, p.end));
@@ -682,7 +624,6 @@ function analyze(day){
   if(nowIdx !== -1){
     current = getCombinedLesson(schedule[nowIdx], schedule);
     countdownTo = current.end;
-    
     let nextSearchIdx = schedule.findIndex(p => p.start.getTime() >= current.end.getTime());
     if(nextSearchIdx !== -1) {
         nextEvent = schedule.slice(nextSearchIdx).find(p => p.type === "event");
@@ -716,6 +657,58 @@ function updateInfo(){
   const timeStr = diffFmt(timeLeft);
   const clockStr = t.toLocaleString('en-US', { weekday:'short', hour:'2-digit', minute:'2-digit', second:'2-digit' });
 
+  // --- HANDLE TOMORROW VIEW UI ---
+  const mainStatusLabel = document.getElementById('mainStatusLabel');
+  const scheduleLabel = document.getElementById('scheduleLabel');
+  const nowSt = document.getElementById('nowStatus');
+
+  if(isTomorrowView) {
+      document.getElementById('clock').textContent = clockStr;
+      
+      // 1. Forceful Status Change
+      mainStatusLabel.textContent = "PREVIEWING TOMORROW";
+      mainStatusLabel.classList.add('tomorrow-mode-text');
+      
+      nowSt.innerHTML = `<span class="tomorrow-mode-text">Day ${currentDay}</span>`;
+      document.getElementById('nowDetail').textContent = "Pack your bags for this schedule";
+      
+      // 2. Forceful Header Change
+      scheduleLabel.innerHTML = `TOMORROW'S SCHEDULE`;
+      scheduleLabel.classList.add('tomorrow-mode-text');
+
+      // 3. Clear Current Data
+      document.getElementById('countdown').textContent = "--:--";
+      document.getElementById('countdown').style.color = "#334155";
+      document.getElementById('nextEvent').textContent = "—";
+      document.getElementById('nextEventTime').textContent = "";
+      document.getElementById('nextLesson').textContent = "—";
+      document.getElementById('nextLessonTime').textContent = "";
+      document.getElementById('doubleLesson').style.display = 'none';
+
+      if(isFullscreen) {
+         document.getElementById('fsClock').textContent = clockStr;
+         document.getElementById('fsCountdown').textContent = "--:--";
+         
+         const fsSub = document.getElementById('fsCurrentSubject');
+         fsSub.textContent = "VIEWING TOMORROW";
+         fsSub.classList.add('tomorrow-mode-text');
+         
+         document.getElementById('fsCurrentTime').textContent = `Day ${currentDay}`;
+         
+         document.getElementById('fsCurrentLabel').textContent = "Status";
+         document.getElementById('fsNextSubject').textContent = "None";
+         document.getElementById('fsNextTime').textContent = "";
+      }
+      return;
+  } 
+
+  // --- NORMAL VIEW RESET ---
+  mainStatusLabel.textContent = "Current";
+  mainStatusLabel.classList.remove('tomorrow-mode-text');
+  
+  scheduleLabel.innerHTML = `Today's Schedule <span id="editIndicator" style="color:var(--warn); display:none">(Editing)</span>`;
+  scheduleLabel.classList.remove('tomorrow-mode-text');
+
   let statusColor = 'var(--accent)'; 
   let isBreak = false;
   
@@ -729,7 +722,6 @@ function updateInfo(){
       statusColor = 'var(--warn)';
   }
 
-  // --- FULLSCREEN UPDATES ---
   if(isFullscreen){
     document.getElementById('fsClock').textContent = clockStr;
     const fsCd = document.getElementById('fsCountdown');
@@ -740,8 +732,10 @@ function updateInfo(){
         fsCd.textContent = "--:--"; 
         fsCd.style.color = '#334155';
     }
-    
     const cSub = document.getElementById('fsCurrentSubject');
+    cSub.classList.remove('tomorrow-mode-text');
+    document.getElementById('fsCurrentLabel').textContent = "Now";
+
     const cTime = document.getElementById('fsCurrentTime');
     if(current) {
         cSub.textContent = current.subject;
@@ -752,16 +746,14 @@ function updateInfo(){
         cSub.style.color = "var(--muted)";
         cTime.textContent = "";
     }
-
+    
     const nSub = document.getElementById('fsNextSubject');
     const nTime = document.getElementById('fsNextTime');
     const nLabel = document.getElementById('fsNextLabel');
-
     let upcoming = null;
-    if(nextLesson && nextEvent) {
-        upcoming = (nextLesson.start < nextEvent.start) ? nextLesson : nextEvent;
-    } else if (nextLesson) { upcoming = nextLesson; }
-    else if (nextEvent) { upcoming = nextEvent; }
+    if(nextLesson && nextEvent) upcoming = (nextLesson.start < nextEvent.start) ? nextLesson : nextEvent;
+    else if (nextLesson) upcoming = nextLesson;
+    else if (nextEvent) upcoming = nextEvent;
 
     if(upcoming){
         nSub.textContent = upcoming.display || upcoming.subject;
@@ -773,14 +765,11 @@ function updateInfo(){
         nTime.textContent = "";
         nLabel.textContent = "Next";
     }
-
     return;
   }
 
-  // --- NORMAL VIEW UPDATES ---
   document.getElementById('clock').textContent = clockStr;
   
-  const nowSt = document.getElementById('nowStatus');
   if(current) {
       nowSt.innerHTML = current.type === "class" 
         ? `<span class="now">${current.subject}</span>` 
@@ -798,7 +787,6 @@ function updateInfo(){
 
   document.getElementById('nextEvent').textContent = nextEvent ? (nextEvent.display || nextEvent.subject) : '—';
   document.getElementById('nextEventTime').textContent = nextEvent ? `${nextEvent.rawStart}–${nextEvent.rawEnd}` : '';
-  
   document.getElementById('nextLesson').textContent = nextLesson ? nextLesson.subject : '—';
   document.getElementById('nextLessonTime').textContent = nextLesson ? `${nextLesson.rawStart}–${nextLesson.rawEnd}` : '';
 
