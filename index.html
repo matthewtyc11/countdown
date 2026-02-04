@@ -1,159 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>
-    const DEFAULT_CLOCK_OFFSET_SECONDS = -35; 
-</script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>Lesson Timer + Percentage</title>
+    <style>
+        /* --- CORE VARIABLES --- */
+        :root {
+          --bg: #0f172a;
+          --panel: #111827;
+          --muted: #94a3b8;
+          --ok: #22c55e;
+          --warn: #f59e0b;
+          --danger: #ef4444;
+          --accent: #38bdf8;
+          --break-color: #10b981;
+        }
 
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext x='16' y='22' font-family='Arial Black, sans-serif' font-size='20' font-weight='bold' text-anchor='middle' fill='%23000000'%3EZZZ%3C/text%3E%3C/svg%3E">
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Lesson Timer (Clear Tomorrow)</title>
-<style>
-  :root{
-    --bg:#0f172a; --panel:#111827; --muted:#94a3b8;
-    --ok:#22c55e; --warn:#f59e0b; --danger:#ef4444; --accent:#38bdf8;
-    --break-color: #10b981;
-  }
-  html,body{height:100%; margin:0; overflow:hidden}
-  body{
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-    background:linear-gradient(180deg,#0b1220,#0f172a);
-    color:#e5e7eb; min-height:100vh; display:flex; flex-direction:column;
-    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-    box-sizing:border-box;
-  }
-  .app{
-    width:100%; height:100%; max-width:100%; margin:0; background:#0b1220cc; backdrop-filter:blur(6px);
-    border-radius:14px; padding:20px; display:flex; flex-direction:column; box-sizing:border-box;
-    transition: all 0.3s ease; position:relative;
-  }
-  header{
-    display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap;
-    margin-bottom:16px; background:#0b1220cc; backdrop-filter:blur(6px); padding-top:8px;
-    z-index: 10;
-  }
-  header h1{font-size:1.4rem; margin:0; font-weight:600}
-  .controls{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-  
-  #settingsPanel {
-    display:none; 
-    flex-direction:column; gap:12px;
-    background: #1e293b; padding: 15px; border-radius: 10px; border: 1px solid #334155;
-    position: absolute; top: 60px; right: 20px; z-index: 20; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    min-width: 280px;
-  }
-  #settingsPanel.show { display:flex; }
+        /* --- LAYOUT & SCROLLING --- */
+        html, body { margin: 0; height: 100%; overflow: auto; }
+        
+        body {
+          font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+          background: linear-gradient(180deg, #0b1220, #0f172a);
+          color: #e5e7eb;
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+          box-sizing: border-box;
+        }
 
-  button, select, input[type="time"] {
-    background:#1e293b; color:#e5e7eb; border:1px solid #334155; border-radius:8px;
-    padding:8px 12px; font-size:14px; touch-action:manipulation; cursor:pointer;
-  }
-  button:active{background:#334155}
-  
-  .primary-btn { background: var(--accent); color: #0f172a; font-weight: bold; border:none; }
-  .danger-btn { background: #7f1d1d; color: #fecaca; border:1px solid #991b1b; }
+        .app {
+          width: 100%; 
+          min-height: 100%; 
+          max-width: 100%; margin: 0;
+          background: #0b1220cc; backdrop-filter: blur(6px);
+          border-radius: 14px; padding: 20px; display: flex; flex-direction: column; box-sizing: border-box;
+          transition: all 0.3s ease; position: relative;
+        }
 
-  /* New Auto Button Styles */
-  #autoSetBtn {
-    background-color: var(--ok); color: #052e16; font-weight: bold;
-    border: none; width: 100%; margin-bottom: 8px; transition: 0.3s;
-  }
-  #autoSetBtn.active-auto {
-    background-color: #475569; color: #94a3b8; cursor: default; pointer-events: none;
-  }
+        /* --- HEADER & CONTROLS --- */
+        header {
+          display: flex; gap: 16px;
+          align-items: center; justify-content: space-between; flex-wrap: wrap;
+          margin-bottom: 16px; background: #0b1220cc; backdrop-filter: blur(6px); padding-top: 8px;
+          z-index: 10;
+        }
+        header h1 { font-size: 1.4rem; margin: 0; font-weight: 600 }
+        .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
 
-  .sync-group { display:flex; align-items:center; justify-content: space-between; gap:4px; }
-  .sync-group button { padding: 4px 8px; font-size:12px; flex:1; }
-  .offset-display { font-family:monospace; font-size:12px; color:var(--accent); min-width:40px; text-align:center;}
+        #settingsPanel {
+          display: none;
+          flex-direction: column; gap: 12px;
+          background: #1e293b; padding: 15px; border-radius: 10px;
+          border: 1px solid #334155;
+          position: absolute; top: 60px; right: 20px; z-index: 20; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+          min-width: 280px;
+        }
+        #settingsPanel.show { display: flex; }
 
-  .test-group { display:flex; gap:8px; }
-  .test-group input { flex:1; background:#0f172a; color:white; }
+        button, select, input[type="time"] {
+          background: #1e293b; color: #e5e7eb; border: 1px solid #334155; border-radius: 8px;
+          padding: 8px 12px; font-size: 14px; touch-action: manipulation; cursor: pointer;
+        }
+        button:active { background: #334155 }
 
-  .grid{display:grid; grid-template-columns:1fr; gap:16px; flex:1}
-  @media (min-width:800px){ .grid{grid-template-columns:repeat(3,1fr)} }
-  
-  .card{
-    background:#0b1220; border:1px solid #1f2937; border-radius:12px; padding:18px;
-    transition: border-color 0.3s;
-  }
-  
-  .header-card-layout {
-    display: grid;
-    grid-template-columns: 1fr auto; 
-    gap: 16px;
-    align-items: start;
-  }
+        .primary-btn { background: var(--accent); color: #0f172a; font-weight: bold; border: none; }
+        .danger-btn { background: #7f1d1d; color: #fecaca; border: 1px solid #991b1b; }
 
-  .label{color:var(--muted); font-size:14px; letter-spacing:.04em; text-transform:uppercase; margin-bottom:6px; line-height: 1.4; display:block;}
-  .value{font-size:20px; font-weight:600}
-  
-  .countdown {
-    font-variant-numeric: tabular-nums; 
-    font-size: clamp(32px, 10vw, 56px); 
-    font-weight: 800; 
-    line-height: 1;
-    white-space: nowrap; 
-    text-align: right;
-  }
+        #autoSetBtn {
+          background-color: var(--ok); color: #052e16; font-weight: bold;
+          border: none; width: 100%; margin-bottom: 8px; transition: 0.3s;
+        }
+        #autoSetBtn.active-auto {
+          background-color: #475569; color: #94a3b8;
+          cursor: default; pointer-events: none;
+        }
 
-  .pill{display:inline-block; padding:6px 12px; border-radius:999px; font-size:14px; border:1px solid #334155}
-  
-  /* TOMORROW MODE STYLES */
-  .tomorrow-mode-text { color: var(--warn) !important; font-weight: bold; }
-  .tomorrow-pill { border-color: var(--warn) !important; color: var(--warn) !important; }
+        .sync-group { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+        .sync-group button { padding: 4px 8px; font-size: 12px; flex: 1; }
+        .offset-display { font-family: monospace; font-size: 12px; color: var(--accent); min-width: 40px; text-align: center; }
 
-  .status-break { color: var(--break-color); font-weight: 700; }
-  .status-warn { color: var(--danger); animation: pulse 1s infinite; }
-  @keyframes pulse { 0%{opacity:1} 50%{opacity:0.8} 100%{opacity:1} }
-  
-  table{width:100%; border-collapse:collapse; font-size:15px; margin-top:10px; table-layout: fixed;}
-  th,td{border-bottom:1px solid #1f2937; padding:12px 6px; vertical-align: middle;}
-  th:nth-child(1), td:nth-child(1) { width: 160px; color: var(--accent); } 
-  th:nth-child(2), td:nth-child(2) { text-align: left; }
+        .test-group { display: flex; gap: 8px; }
+        .test-group input { flex: 1; background: #0f172a; color: white; }
 
-  th{color:#94a3b8; text-align:left; font-weight:600; font-size:13px}
-  .time{color:#a5b4fc; white-space:nowrap}
-  .subject{font-weight:600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-  .small{font-size:13px}
-  
-  .row{display:flex; gap:16px; align-items:center; flex-wrap:wrap}
-  .flexcol{display:flex; flex-direction:column; gap:8px}
-  
-  .content{flex:1; display:flex; flex-direction:column; overflow:hidden}
-  .schedule-card{flex:none; display:flex; flex-direction:column; margin-top:20px; max-height:40vh}
-  .schedule-card > div:first-child{margin-bottom:10px}
-  .schedule-card > div:last-child{flex:1; overflow:auto}
+        /* --- GRID & CARDS --- */
+        .grid { display: grid; grid-template-columns: 1fr; gap: 16px; flex: 1 }
+        @media (min-width: 800px){ .grid{grid-template-columns: repeat(3, 1fr)} }
 
-  .edit-input {
-    width: 100%; background: #0f172a; border: 1px solid #475569; 
-    color: white; padding: 4px; border-radius: 4px; font-size: 14px;
-  }
+        .card {
+          background: #0b1220; border: 1px solid #1f2937; border-radius: 12px; padding: 18px;
+          transition: border-color 0.3s;
+        }
 
-  /* --- FULLSCREEN STYLES --- */
-  #fullscreenLayer {
-    display:none; position:fixed; inset:0; z-index:999;
-    background:#0b1220; 
-    flex-direction:column;
-    padding:env(safe-area-inset-top) 20px env(safe-area-inset-bottom) 20px;
-  }
-  #fullscreenLayer.active { display:flex; }
+        .header-card-layout {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 16px;
+          align-items: start;
+        }
 
-  .fs-section-top { flex: 65; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-  .fs-section-bottom { flex: 35; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 10px; gap: 30px; }
-  .fs-row { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%; }
-  
-  .fs-clock { position: absolute; top: 10px; left: 10px; font-size: 18px; color: #64748b; font-weight: 500; }
-  .fs-countdown { font-size: 28vh; font-weight:900; line-height:1; font-variant-numeric:tabular-nums; text-align:center; }
-  .fs-info-label { font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px;}
-  
-  .fs-info-main { font-size: 28px; font-weight: 700; line-height: 1.1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 90%; }
-  .fs-info-sub { font-size: 20px; color: var(--muted); margin-top: 2px; }
-  
-  .fs-button{ position:absolute; top:10px; right:10px; padding:8px 16px; font-size:16px; background:#334155; border:1px solid #64748b; border-radius:8px; cursor: pointer; z-index: 100; }
-  
-  #testModeBadge { display: none; background: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 8px; vertical-align: middle; text-transform: uppercase; }
-</style>
+        .label { color: var(--muted); font-size: 14px; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; line-height: 1.4; display: block; }
+        .value { font-size: 20px; font-weight: 600 }
+
+        .countdown {
+          font-variant-numeric: tabular-nums;
+          font-size: clamp(32px, 10vw, 56px);
+          font-weight: 800;
+          line-height: 1;
+          white-space: nowrap;
+          text-align: right;
+        }
+
+        /* --- PROGRESS BAR STYLES --- */
+        .progress-track {
+            width: 100%;
+            height: 6px;
+            background: #1e293b;
+            border-radius: 4px;
+            margin-top: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%; 
+            transition: width 0.5s linear, background-color 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        .progress-fill.danger { background: var(--danger); }
+        .progress-fill.break { background: var(--break-color); }
+        
+        #progressPercent {
+            text-align: right; 
+            font-size: 12px; 
+            color: #64748b; 
+            margin-top: 4px; 
+            font-weight: 600;
+            font-family: monospace;
+            min-height: 16px; /* Prevents layout jump when empty */
+        }
+        /* -------------------------------- */
+
+        .pill { display: inline-block; padding: 6px 12px; border-radius: 999px; font-size: 14px; border: 1px solid #334155 }
+        .tomorrow-mode-text { color: var(--warn) !important; font-weight: bold; }
+        .tomorrow-pill { border-color: var(--warn) !important; color: var(--warn) !important; }
+        .status-break { color: var(--break-color); font-weight: 700; }
+        .status-warn { color: var(--danger); animation: pulse 1s infinite; }
+        @keyframes pulse { 0%{opacity:1} 50%{opacity:0.8} 100%{opacity:1} }
+
+        /* --- SCHEDULE TABLE --- */
+        table { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 10px; table-layout: fixed; }
+        th, td { border-bottom: 1px solid #1f2937; padding: 12px 6px; vertical-align: middle; }
+        th:nth-child(1), td:nth-child(1) { width: 160px; color: var(--accent); }
+        th:nth-child(2), td:nth-child(2) { text-align: left; }
+
+        th { color: #94a3b8; text-align: left; font-weight: 600; font-size: 13px }
+        .time { color: #a5b4fc; white-space: nowrap }
+        .subject { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .small { font-size: 13px }
+
+        .row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap }
+        .flexcol { display: flex; flex-direction: column; gap: 8px }
+
+        .content { flex: 1; display: flex; flex-direction: column; overflow: visible; }
+        .schedule-card { flex: none; display: flex; flex-direction: column; margin-top: 20px; max-height: none; height: auto; }
+        .schedule-card > div:first-child { margin-bottom: 10px }
+        .schedule-card > div:last-child { flex: 1; overflow: auto }
+
+        .edit-input {
+          width: 100%; background: #0f172a;
+          border: 1px solid #475569;
+          color: white; padding: 4px; border-radius: 4px; font-size: 14px;
+        }
+
+        /* --- FULLSCREEN STYLES --- */
+        #fullscreenLayer {
+          display: none; position: fixed; inset: 0; z-index: 999;
+          background: #0b1220;
+          flex-direction: column;
+          padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom) 20px;
+        }
+        #fullscreenLayer.active { display: flex; }
+        .fs-section-top { flex: 65; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .fs-section-bottom { flex: 35; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 10px; gap: 30px; }
+        .fs-row { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%; }
+        .fs-clock { position: absolute; top: 10px; left: 10px; font-size: 18px; color: #64748b; font-weight: 500; }
+        .fs-countdown { font-size: 28vh; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; text-align: center; }
+        .fs-info-label { font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px;}
+        .fs-info-main { font-size: 28px; font-weight: 700; line-height: 1.1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 90%; }
+        .fs-info-sub { font-size: 20px; color: var(--muted); margin-top: 2px; }
+        .fs-button {
+          position: absolute;
+          top: 10px; right: 10px; padding: 8px 16px; font-size: 16px; background: #334155; border: 1px solid #64748b; border-radius: 8px; cursor: pointer; z-index: 100;
+        }
+        #testModeBadge { display: none; background: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 8px; vertical-align: middle; text-transform: uppercase; }
+    </style>
 </head>
 <body>
 
@@ -223,7 +269,13 @@
             <div class="flexcol" style="text-align:right">
               <span class="label">Time Remaining</span>
               <div id="countdown" class="countdown">--:--</div>
-              <div id="doubleLesson" class="small success" style="display:none; color:var(--ok);"></div>
+              
+              <div class="progress-track">
+                  <div id="lessonProgressBar" class="progress-fill"></div>
+              </div>
+              <div id="progressPercent"></div>
+              
+              <div id="doubleLesson" class="small success" style="display:none; color:var(--ok); margin-top:4px"></div>
             </div>
           </div>
         </div>
@@ -235,7 +287,7 @@
         </div>
 
         <div class="card">
-          <span class="label">Next Lesson</span>
+           <span class="label">Next Lesson</span>
           <div id="nextLesson" class="value">—</div>
           <div id="nextLessonTime" class="small muted">—</div>
         </div>
@@ -265,7 +317,7 @@
      <div class="fs-section-top">
         <div class="fs-clock" id="fsClock">00:00:00</div>
         <button class="fs-button" id="fsExitBtn">Exit</button>
-        <div class="fs-countdown" id="fsCountdown">--:--</div>
+         <div class="fs-countdown" id="fsCountdown">--:--</div>
      </div>
 
      <div class="fs-section-bottom">
@@ -284,72 +336,69 @@
   </div>
 
 <script>
-const tz = 'Asia/Hong_Kong';
-
-// 1. DATA
-const defaultPeriods = [
-  {start:"08:00",end:"08:20",display:"Morning Devotion",type:"event"},
-  {start:"08:20",end:"08:55",display:"Period 1",type:"class",
-   day1:"Mathematics", day2:"Chinese Language", day3:"Citizenship, Economics and Society",
-   day4:"English Language", day5:"Music", day6:"Physics"},
-  {start:"08:55",end:"09:30",display:"Period 2",type:"class",
-   day1:"Mathematics", day2:"Chinese Language", day3:"Citizenship, Economics and Society",
-   day4:"English Language", day5:"Music", day6:"Physics"},
-  {start:"09:30",end:"09:50",display:"Recess",type:"event"},
-  {start:"09:50",end:"10:25",display:"Period 3",type:"class",
-   day1:"Physics", day2:"English Language", day3:"Chinese Language",
-   day4:"Home Economics", day5:"Mathematics", day6:"English Language"},
-  {start:"10:25",end:"11:00",display:"Period 4",type:"class",
-   day1:"Physics", day2:"English Language", day3:"Chinese Language",
-   day4:"Home Economics", day5:"Mathematics", day6:"English Language"},
-  {start:"11:00",end:"11:15",display:"Recess",type:"event"},
-  {start:"11:15",end:"11:35",display:"Reading time",type:"event"},
-  {start:"11:35",end:"12:10",display:"Period 5",type:"class",
-   day1:"Computer Literacy", day2:"Ethics/Religious Education", day3:"Assembly",
-   day4:"Visual Arts", day5:"History", day6:"Mathematics"},
-  {start:"12:10",end:"12:45",display:"Period 6",type:"class",
-   day1:"Computer Literacy", day2:"History", day3:"Assembly",
-   day4:"Visual Arts", day5:"History", day6:"Mathematics"},
-  {start:"12:45",end:"13:50",display:"Lunch",type:"event"},
-  {start:"13:55",end:"14:30",display:"Period 7",type:"class",
-   day1:"Chinese Language", day2:"Mathematics", day3:"Mathematics",
-   day4:"Mathematics", day5:"Computer Literacy", day6:"Putonghua"},
-  {start:"14:30",end:"15:05",display:"Period 8",type:"class",
-   day1:"History", day2:"Physical Education", day3:"Physics",
-   day4:"Chinese Language", day5:"English Language", day6:"Chinese Language"},
-  {start:"15:05",end:"15:40",display:"Period 9",type:"class",
-   day1:"History", day2:"Physical Education", day3:"Physics",
-   day4:"Chinese Language", day5:"English Language", day6:"Chinese Language"},
-];
-
-const calendarData = {
-"2025-9-2":1,"2025-9-3":2,"2025-9-4":3,"2025-9-5":4,"2025-9-8":5,"2025-9-9":6,"2025-9-10":1,"2025-9-11":2,"2025-9-12":3,"2025-9-15":4,"2025-9-16":5,"2025-9-17":6,"2025-9-18":1,"2025-9-19":2,"2025-9-22":3,"2025-9-23":4,"2025-9-24":5,"2025-9-25":6,"2025-9-29":1,"2025-9-30":2,
-"2025-10-6":3,"2025-10-8":4,"2025-10-9":5,"2025-10-10":6,"2025-10-13":1,"2025-10-14":2,"2025-10-15":3,"2025-10-16":4,"2025-10-17":5,"2025-10-20":6,"2025-10-21":1,"2025-10-22":2,"2025-10-23":3,"2025-10-28":4,"2025-10-30":5,"2025-10-31":6,
-"2025-11-3":1,"2025-11-4":2,"2025-11-5":3,"2025-11-6":4,"2025-11-7":5,"2025-11-10":6,"2025-11-11":1,"2025-11-12":2,"2025-11-13":3,"2025-11-14":4,"2025-11-17":5,"2025-11-18":6,"2025-11-19":1,"2025-11-20":2,"2025-11-21":3,"2025-11-24":4,"2025-11-25":5,"2025-11-26":6,"2025-11-27":1,"2025-11-28":2,
-"2025-12-1":1,"2025-12-2":2,"2025-12-3":3,"2025-12-4":4,"2025-12-5":5,"2025-12-9":6,"2025-12-10":1,"2025-12-11":2,"2025-12-15":3,"2025-12-16":4,"2025-12-17":5,"2025-12-18":6,
-"2026-1-2":1,"2026-1-5":2,"2026-1-6":3,"2026-1-7":4,"2026-1-8":5,"2026-1-9":6,"2026-1-12":1,"2026-1-13":2,"2026-1-14":3,"2026-1-15":4,"2026-1-16":5,"2026-1-21":6,"2026-1-22":1,"2026-1-26":2,"2026-1-27":3,"2026-1-28":4,"2026-1-29":5,"2026-1-30":6,
-"2026-2-3":1,"2026-2-4":2,"2026-2-5":3,"2026-2-6":4,"2026-2-10":5,"2026-2-11":6,"2026-2-12":1,"2026-2-13":2,"2026-2-26":3,"2026-2-27":4,
-"2026-3-2":5,"2026-3-3":6,"2026-3-4":1,"2026-3-5":2,"2026-3-6":3,"2026-3-9":4,"2026-3-10":5,"2026-3-11":6,"2026-3-13":1,"2026-3-16":2,"2026-3-17":3,"2026-3-18":4,"2026-3-19":5,"2026-3-20":6,"2026-3-23":1,"2026-3-24":2,"2026-3-25":1,"2026-3-26":2,"2026-3-27":3,
-"2026-4-9":4,"2026-4-10":5,"2026-4-13":6,"2026-4-14":1,"2026-4-15":2,"2026-4-16":3,"2026-4-17":4,"2026-4-20":5,"2026-4-21":6,"2026-4-22":1,"2026-4-23":2,"2026-4-24":3,"2026-4-27":4,"2026-4-28":5,"2026-4-29":6,"2026-4-30":1,
-"2026-5-4":2,"2026-5-5":3,"2026-5-6":4,"2026-5-7":5,"2026-5-8":6,"2026-5-11":1,"2026-5-12":2,"2026-5-13":3,"2026-5-14":4,"2026-5-15":5,"2026-5-18":6,"2026-5-19":1,"2026-5-20":2,"2026-5-21":3,"2026-5-22":4,"2026-5-26":5,"2026-5-27":6,"2026-5-28":1,"2026-5-29":2,
-"2026-6-1":3,"2026-6-2":4,"2026-6-3":5,"2026-6-4":6,"2026-6-5":1,"2026-6-8":2,"2026-6-9":3,"2026-6-10":4,"2026-6-11":5,"2026-6-12":6,"2026-6-15":1,"2026-6-16":2,"2026-6-17":3,"2026-6-18":4,"2026-6-22":5,"2026-6-23":6,"2026-6-24":1,"2026-6-25":2,"2026-6-26":3,"2026-6-29":4,"2026-6-30":5,
-"2026-7-2":6,"2026-7-3":1
+// --- CONFIG DATA ---
+const configData = {
+  "settings": { "defaultOffsetSeconds": -35, "timeZone": "Asia/Hong_Kong" },
+  "calendar": {
+    "2025-9-2":1,"2025-9-3":2,"2025-9-4":3,"2025-9-5":4,"2025-9-8":5,"2025-9-9":6,"2025-9-10":1,"2025-9-11":2,"2025-9-12":3,"2025-9-15":4,"2025-9-16":5,"2025-9-17":6,"2025-9-18":1,"2025-9-19":2,"2025-9-22":3,"2025-9-23":4,"2025-9-24":5,"2025-9-25":6,"2025-9-29":1,"2025-9-30":2,
+    "2025-10-6":3,"2025-10-8":4,"2025-10-9":5,"2025-10-10":6,"2025-10-13":1,"2025-10-14":2,"2025-10-15":3,"2025-10-16":4,"2025-10-17":5,"2025-10-20":6,"2025-10-21":1,"2025-10-22":2,"2025-10-23":3,"2025-10-28":4,"2025-10-30":5,"2025-10-31":6,
+    "2025-11-3":1,"2025-11-4":2,"2025-11-5":3,"2025-11-6":4,"2025-11-7":5,"2025-11-10":6,"2025-11-11":1,"2025-11-12":2,"2025-11-13":3,"2025-11-14":4,"2025-11-17":5,"2025-11-18":6,"2025-11-19":1,"2025-11-20":2,"2025-11-21":3,"2025-11-24":4,"2025-11-25":5,"2025-11-26":6,"2025-11-27":1,"2025-11-28":2,
+    "2025-12-1":1,"2025-12-2":2,"2025-12-3":3,"2025-12-4":4,"2025-12-5":5,"2025-12-9":6,"2025-12-10":1,"2025-12-11":2,"2025-12-15":3,"2025-12-16":4,"2025-12-17":5,"2025-12-18":6,
+    "2026-1-2":1,"2026-1-5":2,"2026-1-6":3,"2026-1-7":4,"2026-1-8":5,"2026-1-9":6,"2026-1-12":1,"2026-1-13":2,"2026-1-14":3,"2026-1-15":4,"2026-1-16":5,"2026-1-21":6,"2026-1-22":1,"2026-1-26":2,"2026-1-27":3,"2026-1-28":4,"2026-1-29":5,"2026-1-30":6,
+    "2026-2-3":1,"2026-2-4":2,"2026-2-5":3,"2026-2-6":4,"2026-2-10":5,"2026-2-11":6,"2026-2-12":1,"2026-2-13":2,"2026-2-26":3,"2026-2-27":4,
+    "2026-3-2":5,"2026-3-3":6,"2026-3-4":1,"2026-3-5":2,"2026-3-6":3,"2026-3-9":4,"2026-3-10":5,"2026-3-11":6,"2026-3-13":1,"2026-3-16":2,"2026-3-17":3,"2026-3-18":4,"2026-3-19":5,"2026-3-20":6,"2026-3-23":1,"2026-3-24":2,"2026-3-25":1,"2026-3-26":2,"2026-3-27":3,
+    "2026-4-9":4,"2026-4-10":5,"2026-4-13":6,"2026-4-14":1,"2026-4-15":2,"2026-4-16":3,"2026-4-17":4,"2026-4-20":5,"2026-4-21":6,"2026-4-22":1,"2026-4-23":2,"2026-4-24":3,"2026-4-27":4,"2026-4-28":5,"2026-4-29":6,"2026-4-30":1,
+    "2026-5-4":2,"2026-5-5":3,"2026-5-6":4,"2026-5-7":5,"2026-5-8":6,"2026-5-11":1,"2026-5-12":2,"2026-5-13":3,"2026-5-14":4,"2026-5-15":5,"2026-5-18":6,"2026-5-19":1,"2026-5-20":2,"2026-5-21":3,"2026-5-22":4,"2026-5-26":5,"2026-5-27":6,"2026-5-28":1,"2026-5-29":2,
+    "2026-6-1":3,"2026-6-2":4,"2026-6-3":5,"2026-6-4":6,"2026-6-5":1,"2026-6-8":2,"2026-6-9":3,"2026-6-10":4,"2026-6-11":5,"2026-6-12":6,"2026-6-15":1,"2026-6-16":2,"2026-6-17":3,"2026-6-18":4,"2026-6-22":5,"2026-6-23":6,"2026-6-24":1,"2026-6-25":2,"2026-6-26":3,"2026-6-29":4,"2026-6-30":5,
+    "2026-7-2":6,"2026-7-3":1
+  },
+  "defaultPeriods": [
+    {"start":"08:00","end":"08:20","display":"Morning Devotion","type":"event"},
+    {"start":"08:20","end":"08:55","display":"Period 1","type":"class",
+     "day1":"Mathematics", "day2":"Chinese Language", "day3":"Citizenship, Economics and Society",
+     "day4":"English Language", "day5":"Music", "day6":"Physics"},
+    {"start":"08:55","end":"09:30","display":"Period 2","type":"class",
+     "day1":"Mathematics", "day2":"Chinese Language", "day3":"Citizenship, Economics and Society",
+     "day4":"English Language", "day5":"Music", "day6":"Physics"},
+    {"start":"09:30","end":"09:50","display":"Recess","type":"event"},
+    {"start":"09:50","end":"10:25","display":"Period 3","type":"class",
+     "day1":"Physics", "day2":"English Language", "day3":"Chinese Language",
+     "day4":"Home Economics", "day5":"Mathematics", "day6":"English Language"},
+    {"start":"10:25","end":"11:00","display":"Period 4","type":"class",
+     "day1":"Physics", "day2":"English Language", "day3":"Chinese Language",
+     "day4":"Home Economics", "day5":"Mathematics", "day6":"English Language"},
+    {"start":"11:00","end":"11:15","display":"Recess","type":"event"},
+    {"start":"11:15","end":"11:35","display":"Reading time","type":"event"},
+    {"start":"11:35","end":"12:10","display":"Period 5","type":"class",
+     "day1":"Computer Literacy", "day2":"Ethics/Religious Education", "day3":"Assembly",
+     "day4":"Visual Arts", 
+     "day5":"History", "day6":"Mathematics"},
+    {"start":"12:10","end":"12:45","display":"Period 6","type":"class",
+     "day1":"Computer Literacy", "day2":"History", "day3":"Assembly",
+     "day4":"Visual Arts", "day5":"History", "day6":"Mathematics"},
+    {"start":"12:45","end":"13:50","display":"Lunch","type":"event"},
+    {"start":"13:55","end":"14:30","display":"Period 7","type":"class",
+     "day1":"Chinese Language", "day2":"Mathematics", "day3":"Mathematics",
+     "day4":"Mathematics", "day5":"Computer Literacy", "day6":"Putonghua"},
+    {"start":"14:30","end":"15:05","display":"Period 8","type":"class",
+     "day1":"History", "day2":"Physical Education", "day3":"Physics",
+     "day4":"Chinese Language", "day5":"English Language", "day6":"Chinese Language"},
+    {"start":"15:05","end":"15:40","display":"Period 9","type":"class",
+     "day1":"History", "day2":"Physical Education", "day3":"Physics",
+     "day4":"Chinese Language", "day5":"English Language", "day6":"Chinese Language"}
+  ]
 };
 
-let periods = JSON.parse(localStorage.getItem('lessonTimer_data') || JSON.stringify(defaultPeriods));
-const savedOffset = localStorage.getItem('lessonTimer_offset');
-let timeOffset = savedOffset !== null ? parseInt(savedOffset, 10) : (DEFAULT_CLOCK_OFFSET_SECONDS * 1000);
+// --- LOGIC FROM script.js ---
 
-let currentDay = parseInt(localStorage.getItem('lessonTimer_day') || '1');
-let isEditMode = false;
-let isFullscreen = false;
-let testModeOffset = null; 
-let isTomorrowView = false; 
+// Global variables
+let calendarData = {};
+let defaultPeriods = [];
+let tz = 'Asia/Hong_Kong';
+let periods = [];
+let timeOffset = 0;
 
-// DEFAULT: TRUE (If null, it means new user or reset, so TRUE)
-const storedAuto = localStorage.getItem('lessonTimer_isAuto');
-let isAutoMode = storedAuto === null ? true : (storedAuto === 'true');
-
+// UI References
 const app = document.getElementById('normalView');
 const fsLayer = document.getElementById('fullscreenLayer');
 const settingsPanel = document.getElementById('settingsPanel');
@@ -357,18 +406,67 @@ const dayPicker = document.getElementById('dayPicker');
 const autoBtn = document.getElementById('autoSetBtn');
 const pill = document.getElementById('activeDayPill');
 
-// Initial Setup
-dayPicker.value = currentDay;
-updateOffsetDisplay();
-updateAutoButtonUI();
+// State Variables
+let currentDay = 1;
+let isEditMode = false;
+let isFullscreen = false;
+let testModeOffset = null; 
+let isTomorrowView = false;
+let isAutoMode = true;
 
-if (isAutoMode) {
-    activateAutoMode();
+// 1. INITIALIZE
+function init() {
+      const config = configData;
+      
+      calendarData = config.calendar;
+      defaultPeriods = config.defaultPeriods;
+      tz = config.settings.timeZone;
+      const defaultOffsetSec = config.settings.defaultOffsetSeconds;
+
+      periods = JSON.parse(localStorage.getItem('lessonTimer_data') || JSON.stringify(defaultPeriods));
+      
+      const savedOffset = localStorage.getItem('lessonTimer_offset');
+      timeOffset = savedOffset !== null ? parseInt(savedOffset, 10) : (defaultOffsetSec * 1000);
+
+      const storedDay = localStorage.getItem('lessonTimer_day');
+      currentDay = storedDay ? parseInt(storedDay) : 1;
+
+      const storedAuto = localStorage.getItem('lessonTimer_isAuto');
+      isAutoMode = storedAuto === null ? true : (storedAuto === 'true');
+
+      startApp();
 }
+
+init();
+
+function startApp() {
+    dayPicker.value = currentDay;
+    updateOffsetDisplay();
+    updateAutoButtonUI();
+
+    if (isAutoMode) {
+        activateAutoMode();
+    }
+    
+    // Setup Event Listeners
+    document.getElementById('dayPicker').onchange = setDay;
+    document.getElementById('toggleSettingsBtn').onclick = () => {
+        if(settingsPanel.classList.contains('show')) closeSettings();
+        else settingsPanel.classList.add('show');
+    };
+    document.getElementById('fullscreenBtn').onclick = enterFullscreen;
+    document.getElementById('fsExitBtn').onclick = exitFullscreen;
+
+    populateTable(currentDay);
+    setInterval(() => optimisedTick(), 1000);
+    updateInfo();
+}
+
+// --- LOGIC FUNCTIONS ---
 
 function getRealTimeHK() {
   const d = new Date(new Date().toLocaleString('en-US', { timeZone: tz }));
-  return new Date(d.getTime() + timeOffset); 
+  return new Date(d.getTime() + timeOffset);
 }
 
 function nowHK() { 
@@ -379,7 +477,6 @@ function nowHK() {
   return real;
 }
 
-// --- AUTO MODE LOGIC ---
 function activateAutoMode() {
     isAutoMode = true;
     localStorage.setItem('lessonTimer_isAuto', 'true');
@@ -394,14 +491,13 @@ function checkAutoDate() {
     let useDate = t;
     isTomorrowView = false;
 
-    // --- CHECK TIME: If after 15:40 (3:40 PM), use TOMORROW'S date ---
+    // After 15:40, switch to tomorrow
     if (t.getHours() > 15 || (t.getHours() === 15 && t.getMinutes() >= 40)) {
         useDate = new Date(t);
         useDate.setDate(t.getDate() + 1);
         isTomorrowView = true;
     }
 
-    // Key format: YYYY-M-D
     const key = `${useDate.getFullYear()}-${useDate.getMonth() + 1}-${useDate.getDate()}`;
     const autoDay = calendarData[key];
 
@@ -412,9 +508,8 @@ function checkAutoDate() {
         populateTable(currentDay);
         updateInfo();
     } else {
-        // If data missing for tomorrow, fallback to today to avoid broken UI
         if(isTomorrowView && !autoDay) {
-             isTomorrowView = false; 
+             isTomorrowView = false;
         }
     }
 }
@@ -501,7 +596,8 @@ function getCombinedLesson(period, schedule) {
     while(backIdx >= 0) {
         let prev = schedule[backIdx];
         if(prev.subject === combined.subject && prev.end.getTime() === combined.start.getTime()){
-            combined.start = prev.start; combined.rawStart = prev.rawStart; 
+            combined.start = prev.start;
+            combined.rawStart = prev.rawStart; 
             isConnected = true; backIdx--;
         } else break;
     }
@@ -510,7 +606,8 @@ function getCombinedLesson(period, schedule) {
     while(fwdIdx < schedule.length) {
         let next = schedule[fwdIdx];
         if(next.subject === combined.subject && next.start.getTime() === activeEndTime.getTime()){
-            activeEndTime = next.end; combined.end = activeEndTime; combined.rawEnd = next.rawEnd; 
+            activeEndTime = next.end;
+            combined.end = activeEndTime; combined.rawEnd = next.rawEnd; 
             isConnected = true; fwdIdx++;
         } else break;
     }
@@ -518,14 +615,8 @@ function getCombinedLesson(period, schedule) {
     return combined;
 }
 
-const toggleBtn = document.getElementById('toggleSettingsBtn');
-toggleBtn.onclick = () => {
-    if(settingsPanel.classList.contains('show')) closeSettings();
-    else settingsPanel.classList.add('show');
-}
-
 function closeSettings() {
-    if(isEditMode) toggleEditMode(); 
+    if(isEditMode) toggleEditMode();
     settingsPanel.classList.remove('show');
 }
 
@@ -560,7 +651,7 @@ function saveFromTable(){
 
 function resetData(){
     if(confirm("Reset all subjects and return settings to default?")){
-        localStorage.clear(); 
+        localStorage.clear();
         location.reload(); 
     }
 }
@@ -580,13 +671,11 @@ function setDay(){
   populateTable(currentDay); 
   updateInfo(); 
 }
-document.getElementById('dayPicker').onchange = setDay;
 
 function populateTable(day){
   const tbody = document.getElementById('scheduleBody');
   tbody.innerHTML = '';
   const sched = getDaySchedule(day);
-  
   sched.forEach(r => {
     const tr = document.createElement('tr');
     if(isEditMode){
@@ -596,8 +685,6 @@ function populateTable(day){
     }
     tbody.appendChild(tr);
   });
-  
-  // --- PILL UPDATE LOGIC ---
   const pillText = `Day ${day}`;
   if(isTomorrowView) {
       pill.innerHTML = `⚠️ ${pillText} (Tomorrow)`;
@@ -618,9 +705,7 @@ function analyze(day){
   const schedule = getDaySchedule(day);
   const t = nowHK();
   const nowIdx = schedule.findIndex(p => between(t, p.start, p.end));
-  
   let current = null, nextEvent = null, nextLesson = null, countdownTo = null;
-  
   if(nowIdx !== -1){
     current = getCombinedLesson(schedule[nowIdx], schedule);
     countdownTo = current.end;
@@ -635,9 +720,8 @@ function analyze(day){
     nextEvent = schedule.find(p => p.start > t && p.type === "event");
     let foundNextLesson = schedule.find(p => p.start > t && p.type === "class");
     if(foundNextLesson) nextLesson = getCombinedLesson(foundNextLesson, schedule);
-    
     if(nextEvent || nextLesson) {
-        const eStart = nextEvent ? nextEvent.start : new Date(8640000000000000); 
+        const eStart = nextEvent ? nextEvent.start : new Date(8640000000000000);
         const lStart = nextLesson ? nextLesson.start : new Date(8640000000000000);
         const upcoming = (eStart < lStart) ? nextEvent : nextLesson;
         countdownTo = upcoming.start;
@@ -651,32 +735,54 @@ function analyze(day){
 }
 
 function updateInfo(){
+  if(!defaultPeriods.length) return;
+
   const { current, nextEvent, nextLesson, countdownTo } = analyze(currentDay);
   const t = nowHK();
   const timeLeft = countdownTo ? countdownTo - t : 0;
   const timeStr = diffFmt(timeLeft);
   const clockStr = t.toLocaleString('en-US', { weekday:'short', hour:'2-digit', minute:'2-digit', second:'2-digit' });
-
-  // --- HANDLE TOMORROW VIEW UI ---
+  
   const mainStatusLabel = document.getElementById('mainStatusLabel');
   const scheduleLabel = document.getElementById('scheduleLabel');
   const nowSt = document.getElementById('nowStatus');
+  const bar = document.getElementById('lessonProgressBar');
+  const pctText = document.getElementById('progressPercent');
+
+  // --- PROGRESS BAR & PERCENT LOGIC ---
+  if(current && countdownTo && !isTomorrowView) {
+      const totalDuration = current.end - current.start;
+      const elapsed = t - current.start;
+      let pct = (elapsed / totalDuration) * 100;
+      if (pct < 0) pct = 0; if (pct > 100) pct = 100;
+      
+      bar.style.width = `${pct}%`;
+      pctText.textContent = `${Math.floor(pct)}%`; // UPDATE TEXT
+      
+      if(timeLeft < 60000) bar.classList.add('danger');
+      else bar.classList.remove('danger');
+      
+      if(current.type === 'event') bar.classList.add('break');
+      else bar.classList.remove('break');
+      
+  } else {
+      bar.style.width = '0%';
+      pctText.textContent = ''; // HIDE TEXT
+      bar.classList.remove('danger', 'break');
+  }
+  // ------------------------------------
 
   if(isTomorrowView) {
       document.getElementById('clock').textContent = clockStr;
-      
-      // 1. Forceful Status Change
       mainStatusLabel.textContent = "PREVIEWING TOMORROW";
       mainStatusLabel.classList.add('tomorrow-mode-text');
       
       nowSt.innerHTML = `<span class="tomorrow-mode-text">Day ${currentDay}</span>`;
       document.getElementById('nowDetail').textContent = "Pack your bags for this schedule";
       
-      // 2. Forceful Header Change
       scheduleLabel.innerHTML = `TOMORROW'S SCHEDULE`;
       scheduleLabel.classList.add('tomorrow-mode-text');
 
-      // 3. Clear Current Data
       document.getElementById('countdown').textContent = "--:--";
       document.getElementById('countdown').style.color = "#334155";
       document.getElementById('nextEvent').textContent = "—";
@@ -684,7 +790,6 @@ function updateInfo(){
       document.getElementById('nextLesson').textContent = "—";
       document.getElementById('nextLessonTime').textContent = "";
       document.getElementById('doubleLesson').style.display = 'none';
-
       if(isFullscreen) {
          document.getElementById('fsClock').textContent = clockStr;
          document.getElementById('fsCountdown').textContent = "--:--";
@@ -702,7 +807,6 @@ function updateInfo(){
       return;
   } 
 
-  // --- NORMAL VIEW RESET ---
   mainStatusLabel.textContent = "Current";
   mainStatusLabel.classList.remove('tomorrow-mode-text');
   
@@ -711,11 +815,13 @@ function updateInfo(){
 
   let statusColor = 'var(--accent)'; 
   let isBreak = false;
-  
   if(current){
-    if(current.type === 'event') { statusColor = 'var(--break-color)'; isBreak = true; } 
-    else if (timeLeft < 60000 && timeLeft > 0) { statusColor = 'var(--danger)'; } 
-    else { statusColor = 'var(--ok)'; }
+    if(current.type === 'event') { statusColor = 'var(--break-color)'; isBreak = true;
+    } 
+    else if (timeLeft < 60000 && timeLeft > 0) { statusColor = 'var(--danger)';
+    } 
+    else { statusColor = 'var(--ok)';
+    }
   } else if (!countdownTo) { 
       statusColor = 'var(--muted)';
   } else { 
@@ -769,10 +875,10 @@ function updateInfo(){
   }
 
   document.getElementById('clock').textContent = clockStr;
-  
   if(current) {
       nowSt.innerHTML = current.type === "class" 
-        ? `<span class="now">${current.subject}</span>` 
+        ?
+        `<span class="now">${current.subject}</span>` 
         : `<span class="status-break">${current.subject}</span>`;
       document.getElementById('nowDetail').textContent = `${current.rawStart}–${current.rawEnd}`;
   } else { 
@@ -786,10 +892,10 @@ function updateInfo(){
   }
 
   document.getElementById('nextEvent').textContent = nextEvent ? (nextEvent.display || nextEvent.subject) : '—';
-  document.getElementById('nextEventTime').textContent = nextEvent ? `${nextEvent.rawStart}–${nextEvent.rawEnd}` : '';
+  document.getElementById('nextEventTime').textContent = nextEvent ?
+  `${nextEvent.rawStart}–${nextEvent.rawEnd}` : '';
   document.getElementById('nextLesson').textContent = nextLesson ? nextLesson.subject : '—';
   document.getElementById('nextLessonTime').textContent = nextLesson ? `${nextLesson.rawStart}–${nextLesson.rawEnd}` : '';
-
   const dbl = document.getElementById('doubleLesson');
   if(current?.isDouble){
       dbl.style.display = 'inline-block';
@@ -811,19 +917,13 @@ function updateInfo(){
 
 function enterFullscreen(){ isFullscreen = true; fsLayer.classList.add('active'); app.style.display = 'none'; updateInfo(); }
 function exitFullscreen(){ isFullscreen = false; fsLayer.classList.remove('active'); app.style.display = 'flex'; updateInfo(); }
-document.getElementById('fullscreenBtn').onclick = enterFullscreen;
-document.getElementById('fsExitBtn').onclick = exitFullscreen;
 
 let lastFullUpdate = 0;
 function optimisedTick(force = false){
   const now = Date.now();
-  updateInfo(); 
+  updateInfo();
   if(force || now - lastFullUpdate > 5000){ lastFullUpdate = now; }
 }
-
-populateTable(currentDay);
-setInterval(() => optimisedTick(), 1000);
-updateInfo();
 </script>
 </body>
 </html>
