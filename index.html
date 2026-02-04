@@ -32,7 +32,7 @@
         }
 
         .app {
-          width: 100%; 
+          width: 100%;
           min-height: 100%; 
           max-width: 100%; margin: 0;
           background: #0b1220cc; backdrop-filter: blur(6px);
@@ -42,7 +42,8 @@
 
         /* --- HEADER & CONTROLS --- */
         header {
-          display: flex; gap: 16px;
+          display: flex;
+          gap: 16px;
           align-items: center; justify-content: space-between; flex-wrap: wrap;
           margin-bottom: 16px; background: #0b1220cc; backdrop-filter: blur(6px); padding-top: 8px;
           z-index: 10;
@@ -55,13 +56,15 @@
           flex-direction: column; gap: 12px;
           background: #1e293b; padding: 15px; border-radius: 10px;
           border: 1px solid #334155;
-          position: absolute; top: 60px; right: 20px; z-index: 20; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+          position: absolute; top: 60px; right: 20px;
+          z-index: 20; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
           min-width: 280px;
         }
         #settingsPanel.show { display: flex; }
 
         button, select, input[type="time"] {
-          background: #1e293b; color: #e5e7eb; border: 1px solid #334155; border-radius: 8px;
+          background: #1e293b;
+          color: #e5e7eb; border: 1px solid #334155; border-radius: 8px;
           padding: 8px 12px; font-size: 14px; touch-action: manipulation; cursor: pointer;
         }
         button:active { background: #334155 }
@@ -70,11 +73,13 @@
         .danger-btn { background: #7f1d1d; color: #fecaca; border: 1px solid #991b1b; }
 
         #autoSetBtn {
-          background-color: var(--ok); color: #052e16; font-weight: bold;
+          background-color: var(--ok);
+          color: #052e16; font-weight: bold;
           border: none; width: 100%; margin-bottom: 8px; transition: 0.3s;
         }
         #autoSetBtn.active-auto {
-          background-color: #475569; color: #94a3b8;
+          background-color: #475569;
+          color: #94a3b8;
           cursor: default; pointer-events: none;
         }
 
@@ -90,7 +95,8 @@
         @media (min-width: 800px){ .grid{grid-template-columns: repeat(3, 1fr)} }
 
         .card {
-          background: #0b1220; border: 1px solid #1f2937; border-radius: 12px; padding: 18px;
+          background: #0b1220;
+          border: 1px solid #1f2937; border-radius: 12px; padding: 18px;
           transition: border-color 0.3s;
         }
 
@@ -99,6 +105,7 @@
           grid-template-columns: 1fr auto;
           gap: 16px;
           align-items: start;
+          margin-bottom: 8px; /* Added spacing between info and bar */
         }
 
         .label { color: var(--muted); font-size: 14px; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; line-height: 1.4; display: block; }
@@ -113,13 +120,23 @@
           text-align: right;
         }
 
-        /* --- PROGRESS BAR STYLES --- */
-        .progress-track {
+        /* --- UPDATED PROGRESS BAR LAYOUT --- */
+        .progress-row {
+            display: flex;
+            align-items: center; 
+            gap: 16px; 
+            margin-top: 16px;
             width: 100%;
-            height: 6px;
+            /* Moved out of the right column, now spans full width */
+            border-top: 1px solid #1f2937; /* Optional: adds subtle separation */
+            padding-top: 16px;
+        }
+
+        .progress-track {
+            flex: 1; 
+            height: 24px;
             background: #1e293b;
-            border-radius: 4px;
-            margin-top: 12px;
+            border-radius: 12px;
             overflow: hidden;
             position: relative;
         }
@@ -129,20 +146,21 @@
             background: var(--accent);
             width: 0%; 
             transition: width 0.5s linear, background-color 0.3s ease;
-            border-radius: 4px;
+            border-radius: 12px;
         }
         
         .progress-fill.danger { background: var(--danger); }
         .progress-fill.break { background: var(--break-color); }
         
         #progressPercent {
-            text-align: right; 
-            font-size: 12px; 
-            color: #64748b; 
-            margin-top: 4px; 
-            font-weight: 600;
-            font-family: monospace;
-            min-height: 16px; /* Prevents layout jump when empty */
+            font-size: 32px; 
+            color: #e5e7eb;
+            font-weight: 800;
+            font-family: inherit;
+            line-height: 1;
+            white-space: nowrap;
+            min-width: 85px;
+            text-align: right;
         }
         /* -------------------------------- */
 
@@ -173,14 +191,16 @@
         .schedule-card > div:last-child { flex: 1; overflow: auto }
 
         .edit-input {
-          width: 100%; background: #0f172a;
+          width: 100%;
+          background: #0f172a;
           border: 1px solid #475569;
           color: white; padding: 4px; border-radius: 4px; font-size: 14px;
         }
 
         /* --- FULLSCREEN STYLES --- */
         #fullscreenLayer {
-          display: none; position: fixed; inset: 0; z-index: 999;
+          display: none;
+          position: fixed; inset: 0; z-index: 999;
           background: #0b1220;
           flex-direction: column;
           padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom) 20px;
@@ -196,7 +216,8 @@
         .fs-info-sub { font-size: 20px; color: var(--muted); margin-top: 2px; }
         .fs-button {
           position: absolute;
-          top: 10px; right: 10px; padding: 8px 16px; font-size: 16px; background: #334155; border: 1px solid #64748b; border-radius: 8px; cursor: pointer; z-index: 100;
+          top: 10px; right: 10px; padding: 8px 16px; font-size: 16px; background: #334155; border: 1px solid #64748b; border-radius: 8px; cursor: pointer;
+          z-index: 100;
         }
         #testModeBadge { display: none; background: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 8px; vertical-align: middle; text-transform: uppercase; }
     </style>
@@ -269,14 +290,15 @@
             <div class="flexcol" style="text-align:right">
               <span class="label">Time Remaining</span>
               <div id="countdown" class="countdown">--:--</div>
-              
+              <div id="doubleLesson" class="small success" style="display:none; color:var(--ok); margin-top:4px"></div>
+            </div>
+          </div>
+          
+          <div class="progress-row">
               <div class="progress-track">
                   <div id="lessonProgressBar" class="progress-fill"></div>
               </div>
               <div id="progressPercent"></div>
-              
-              <div id="doubleLesson" class="small success" style="display:none; color:var(--ok); margin-top:4px"></div>
-            </div>
           </div>
         </div>
 
@@ -287,7 +309,7 @@
         </div>
 
         <div class="card">
-           <span class="label">Next Lesson</span>
+          <span class="label">Next Lesson</span>
           <div id="nextLesson" class="value">—</div>
           <div id="nextLessonTime" class="small muted">—</div>
         </div>
@@ -317,7 +339,7 @@
      <div class="fs-section-top">
         <div class="fs-clock" id="fsClock">00:00:00</div>
         <button class="fs-button" id="fsExitBtn">Exit</button>
-         <div class="fs-countdown" id="fsCountdown">--:--</div>
+        <div class="fs-countdown" id="fsCountdown">--:--</div>
      </div>
 
      <div class="fs-section-bottom">
@@ -388,7 +410,6 @@ const configData = {
      "day4":"Chinese Language", "day5":"English Language", "day6":"Chinese Language"}
   ]
 };
-
 // --- LOGIC FROM script.js ---
 
 // Global variables
@@ -405,26 +426,23 @@ const settingsPanel = document.getElementById('settingsPanel');
 const dayPicker = document.getElementById('dayPicker');
 const autoBtn = document.getElementById('autoSetBtn');
 const pill = document.getElementById('activeDayPill');
-
 // State Variables
 let currentDay = 1;
 let isEditMode = false;
 let isFullscreen = false;
-let testModeOffset = null; 
+let testModeOffset = null;
 let isTomorrowView = false;
 let isAutoMode = true;
 
 // 1. INITIALIZE
 function init() {
       const config = configData;
-      
       calendarData = config.calendar;
       defaultPeriods = config.defaultPeriods;
       tz = config.settings.timeZone;
       const defaultOffsetSec = config.settings.defaultOffsetSeconds;
 
       periods = JSON.parse(localStorage.getItem('lessonTimer_data') || JSON.stringify(defaultPeriods));
-      
       const savedOffset = localStorage.getItem('lessonTimer_offset');
       timeOffset = savedOffset !== null ? parseInt(savedOffset, 10) : (defaultOffsetSec * 1000);
 
@@ -443,7 +461,6 @@ function startApp() {
     dayPicker.value = currentDay;
     updateOffsetDisplay();
     updateAutoButtonUI();
-
     if (isAutoMode) {
         activateAutoMode();
     }
@@ -490,7 +507,6 @@ function checkAutoDate() {
     let t = nowHK();
     let useDate = t;
     isTomorrowView = false;
-
     // After 15:40, switch to tomorrow
     if (t.getHours() > 15 || (t.getHours() === 15 && t.getMinutes() >= 40)) {
         useDate = new Date(t);
@@ -500,7 +516,6 @@ function checkAutoDate() {
 
     const key = `${useDate.getFullYear()}-${useDate.getMonth() + 1}-${useDate.getDate()}`;
     const autoDay = calendarData[key];
-
     if (autoDay) {
         currentDay = autoDay;
         dayPicker.value = currentDay;
@@ -695,7 +710,8 @@ function populateTable(day){
   }
 }
 
-function between(t, a, b){ return t >= a && t < b; }
+function between(t, a, b){ return t >= a && t < b;
+}
 
 function analyze(day){
   if(isTomorrowView) {
@@ -748,7 +764,6 @@ function updateInfo(){
   const nowSt = document.getElementById('nowStatus');
   const bar = document.getElementById('lessonProgressBar');
   const pctText = document.getElementById('progressPercent');
-
   // --- PROGRESS BAR & PERCENT LOGIC ---
   if(current && countdownTo && !isTomorrowView) {
       const totalDuration = current.end - current.start;
@@ -757,17 +772,18 @@ function updateInfo(){
       if (pct < 0) pct = 0; if (pct > 100) pct = 100;
       
       bar.style.width = `${pct}%`;
-      pctText.textContent = `${Math.floor(pct)}%`; // UPDATE TEXT
+      pctText.textContent = `${Math.floor(pct)}%`;
+      // UPDATE TEXT
       
       if(timeLeft < 60000) bar.classList.add('danger');
       else bar.classList.remove('danger');
-      
       if(current.type === 'event') bar.classList.add('break');
       else bar.classList.remove('break');
       
   } else {
       bar.style.width = '0%';
-      pctText.textContent = ''; // HIDE TEXT
+      pctText.textContent = '';
+      // HIDE TEXT
       bar.classList.remove('danger', 'break');
   }
   // ------------------------------------
@@ -776,13 +792,11 @@ function updateInfo(){
       document.getElementById('clock').textContent = clockStr;
       mainStatusLabel.textContent = "PREVIEWING TOMORROW";
       mainStatusLabel.classList.add('tomorrow-mode-text');
-      
       nowSt.innerHTML = `<span class="tomorrow-mode-text">Day ${currentDay}</span>`;
       document.getElementById('nowDetail').textContent = "Pack your bags for this schedule";
       
       scheduleLabel.innerHTML = `TOMORROW'S SCHEDULE`;
       scheduleLabel.classList.add('tomorrow-mode-text');
-
       document.getElementById('countdown').textContent = "--:--";
       document.getElementById('countdown').style.color = "#334155";
       document.getElementById('nextEvent').textContent = "—";
@@ -793,7 +807,6 @@ function updateInfo(){
       if(isFullscreen) {
          document.getElementById('fsClock').textContent = clockStr;
          document.getElementById('fsCountdown').textContent = "--:--";
-         
          const fsSub = document.getElementById('fsCurrentSubject');
          fsSub.textContent = "VIEWING TOMORROW";
          fsSub.classList.add('tomorrow-mode-text');
@@ -809,7 +822,6 @@ function updateInfo(){
 
   mainStatusLabel.textContent = "Current";
   mainStatusLabel.classList.remove('tomorrow-mode-text');
-  
   scheduleLabel.innerHTML = `Today's Schedule <span id="editIndicator" style="color:var(--warn); display:none">(Editing)</span>`;
   scheduleLabel.classList.remove('tomorrow-mode-text');
 
@@ -877,8 +889,7 @@ function updateInfo(){
   document.getElementById('clock').textContent = clockStr;
   if(current) {
       nowSt.innerHTML = current.type === "class" 
-        ?
-        `<span class="now">${current.subject}</span>` 
+        ? `<span class="now">${current.subject}</span>` 
         : `<span class="status-break">${current.subject}</span>`;
       document.getElementById('nowDetail').textContent = `${current.rawStart}–${current.rawEnd}`;
   } else { 
@@ -892,8 +903,7 @@ function updateInfo(){
   }
 
   document.getElementById('nextEvent').textContent = nextEvent ? (nextEvent.display || nextEvent.subject) : '—';
-  document.getElementById('nextEventTime').textContent = nextEvent ?
-  `${nextEvent.rawStart}–${nextEvent.rawEnd}` : '';
+  document.getElementById('nextEventTime').textContent = nextEvent ? `${nextEvent.rawStart}–${nextEvent.rawEnd}` : '';
   document.getElementById('nextLesson').textContent = nextLesson ? nextLesson.subject : '—';
   document.getElementById('nextLessonTime').textContent = nextLesson ? `${nextLesson.rawStart}–${nextLesson.rawEnd}` : '';
   const dbl = document.getElementById('doubleLesson');
@@ -916,7 +926,8 @@ function updateInfo(){
 }
 
 function enterFullscreen(){ isFullscreen = true; fsLayer.classList.add('active'); app.style.display = 'none'; updateInfo(); }
-function exitFullscreen(){ isFullscreen = false; fsLayer.classList.remove('active'); app.style.display = 'flex'; updateInfo(); }
+function exitFullscreen(){ isFullscreen = false; fsLayer.classList.remove('active'); app.style.display = 'flex'; updateInfo();
+}
 
 let lastFullUpdate = 0;
 function optimisedTick(force = false){
