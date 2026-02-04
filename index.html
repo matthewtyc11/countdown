@@ -188,7 +188,8 @@
         .content { flex: 1; display: flex; flex-direction: column; overflow: visible; }
         .schedule-card { flex: none; display: flex; flex-direction: column; margin-top: 20px; max-height: none; height: auto; }
         .schedule-card > div:first-child { margin-bottom: 10px }
-        .schedule-card > div:last-child { flex: 1; overflow: auto }
+        /* CHANGED: Removed 'overflow: auto' here to remove the second scrollbar */
+        .schedule-card > div:last-child { flex: 1; overflow: visible; }
 
         .edit-input {
           width: 100%;
