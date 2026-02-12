@@ -3,6 +3,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    
+    <meta name="theme-color" content="#0b1220">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <title>Lesson Timer + Percentage</title>
     <style>
         /* --- CORE VARIABLES --- */
@@ -17,27 +21,48 @@
           --break-color: #10b981;
         }
 
-        /* --- LAYOUT & SCROLLING --- */
-        html, body { margin: 0; height: 100%; overflow: auto; }
+        /* --- LAYOUT & SCROLLING FIX --- */
+        html {
+            /* 1. Set the background color of the 'void' area to dark blue */
+            background-color: #0b1220;
+            
+            /* 2. Ensure the page takes up full height naturally */
+            min-height: 100%;
+        }
         
         body {
-          font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-          background: linear-gradient(180deg, #0b1220, #0f172a);
-          color: #e5e7eb;
-          min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-          padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-          box-sizing: border-box;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+            
+            /* Gradient sits on top of the html background */
+            background: linear-gradient(180deg, #0b1220, #0f172a);
+            color: #e5e7eb;
+            
+            /* 3. Standard scrolling setup (Removed 'overflow-y: auto' and 'overscroll-behavior') */
+            /* This brings back the natural bounce */
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            
+            display: flex;
+            flex-direction: column;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            box-sizing: border-box;
         }
 
         .app {
           width: 100%;
+          height: auto; 
           min-height: 100%; 
-          max-width: 100%; margin: 0;
+          
+          max-width: 100%; 
+          margin: 0;
           background: #0b1220cc; backdrop-filter: blur(6px);
-          border-radius: 14px; padding: 20px; display: flex; flex-direction: column; box-sizing: border-box;
+          border-radius: 14px; padding: 20px; 
+          
+          display: flex; flex-direction: column; box-sizing: border-box;
           transition: all 0.3s ease; position: relative;
+          
+          overflow: visible;
         }
 
         /* --- HEADER & CONTROLS --- */
@@ -120,15 +145,14 @@
           text-align: right;
         }
 
-        /* --- UPDATED PROGRESS BAR LAYOUT --- */
+        /* --- PROGRESS BAR LAYOUT --- */
         .progress-row {
             display: flex;
             align-items: center; 
             gap: 16px; 
             margin-top: 16px;
             width: 100%;
-            /* Moved out of the right column, now spans full width */
-            border-top: 1px solid #1f2937; /* Optional: adds subtle separation */
+            border-top: 1px solid #1f2937; 
             padding-top: 16px;
         }
 
@@ -186,9 +210,9 @@
         .flexcol { display: flex; flex-direction: column; gap: 8px }
 
         .content { flex: 1; display: flex; flex-direction: column; overflow: visible; }
+        
         .schedule-card { flex: none; display: flex; flex-direction: column; margin-top: 20px; max-height: none; height: auto; }
         .schedule-card > div:first-child { margin-bottom: 10px }
-        /* CHANGED: Removed 'overflow: auto' here to remove the second scrollbar */
         .schedule-card > div:last-child { flex: 1; overflow: visible; }
 
         .edit-input {
@@ -361,7 +385,7 @@
 <script>
 // --- CONFIG DATA ---
 const configData = {
-  "settings": { "defaultOffsetSeconds": -37, "timeZone": "Asia/Hong_Kong" },
+  "settings": { "defaultOffsetSeconds": -35, "timeZone": "Asia/Hong_Kong" },
   "calendar": {
     "2025-9-2":1,"2025-9-3":2,"2025-9-4":3,"2025-9-5":4,"2025-9-8":5,"2025-9-9":6,"2025-9-10":1,"2025-9-11":2,"2025-9-12":3,"2025-9-15":4,"2025-9-16":5,"2025-9-17":6,"2025-9-18":1,"2025-9-19":2,"2025-9-22":3,"2025-9-23":4,"2025-9-24":5,"2025-9-25":6,"2025-9-29":1,"2025-9-30":2,
     "2025-10-6":3,"2025-10-8":4,"2025-10-9":5,"2025-10-10":6,"2025-10-13":1,"2025-10-14":2,"2025-10-15":3,"2025-10-16":4,"2025-10-17":5,"2025-10-20":6,"2025-10-21":1,"2025-10-22":2,"2025-10-23":3,"2025-10-28":4,"2025-10-30":5,"2025-10-31":6,
