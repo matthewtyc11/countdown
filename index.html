@@ -48,7 +48,8 @@
           margin: 0;
           background: #0b1220cc; backdrop-filter: blur(6px);
           border-radius: 14px; padding: 20px; 
-          display: flex; flex-direction: column; box-sizing: border-box;
+          display: flex; flex-direction: column;
+          box-sizing: border-box;
           transition: all 0.3s ease; position: relative;
           overflow: visible;
         }
@@ -61,8 +62,10 @@
           margin-bottom: 16px; background: #0b1220cc; backdrop-filter: blur(6px); padding-top: 8px;
           z-index: 10;
         }
-        header h1 { font-size: 1.4rem; margin: 0; font-weight: 600 }
-        .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
+        header h1 { font-size: 1.4rem; margin: 0;
+          font-weight: 600 }
+        .controls { display: flex; gap: 8px; align-items: center;
+          flex-wrap: wrap }
 
         #settingsPanel {
           display: none;
@@ -73,7 +76,8 @@
           z-index: 20; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
           min-width: 280px;
         }
-        #settingsPanel.show { display: flex; }
+        #settingsPanel.show { display: flex;
+        }
 
         button, select, input[type="time"] {
           background: #1e293b;
@@ -82,8 +86,10 @@
         }
         button:active { background: #334155 }
 
-        .primary-btn { background: var(--accent); color: #0f172a; font-weight: bold; border: none; }
-        .danger-btn { background: #7f1d1d; color: #fecaca; border: 1px solid #991b1b; }
+        .primary-btn { background: var(--accent);
+          color: #0f172a; font-weight: bold; border: none; }
+        .danger-btn { background: #7f1d1d; color: #fecaca;
+          border: 1px solid #991b1b; }
 
         #autoSetBtn {
           background-color: var(--ok);
@@ -96,15 +102,21 @@
           cursor: default; pointer-events: none;
         }
 
-        .sync-group { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
-        .sync-group button { padding: 4px 8px; font-size: 12px; flex: 1; }
-        .offset-display { font-family: monospace; font-size: 12px; color: var(--accent); min-width: 40px; text-align: center; }
+        .sync-group { display: flex; align-items: center;
+          justify-content: space-between; gap: 4px; }
+        .sync-group button { padding: 4px 8px; font-size: 12px;
+          flex: 1; }
+        .offset-display { font-family: monospace; font-size: 12px; color: var(--accent); min-width: 40px;
+          text-align: center; }
 
-        .test-group { display: flex; gap: 8px; }
-        .test-group input { flex: 1; background: #0f172a; color: white; }
+        .test-group { display: flex; gap: 8px;
+        }
+        .test-group input { flex: 1; background: #0f172a; color: white;
+        }
 
         /* --- GRID & CARDS --- */
-        .grid { display: grid; grid-template-columns: 1fr; gap: 16px; flex: 1 }
+        .grid { display: grid;
+          grid-template-columns: 1fr; gap: 16px; flex: 1 }
         @media (min-width: 800px){ .grid{grid-template-columns: repeat(3, 1fr)} }
 
         .card {
@@ -121,8 +133,11 @@
           margin-bottom: 8px; 
         }
 
-        .label { color: var(--muted); font-size: 14px; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; line-height: 1.4; display: block; }
-        .value { font-size: 20px; font-weight: 600 }
+        .label { color: var(--muted);
+          font-size: 14px; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; line-height: 1.4; display: block;
+        }
+        .value { font-size: 20px;
+          font-weight: 600 }
 
         .countdown {
           font-variant-numeric: tabular-nums;
@@ -145,7 +160,7 @@
         }
 
         .progress-track {
-            flex: 1; 
+            flex: 1;
             height: 24px;
             background: #1e293b;
             border-radius: 12px;
@@ -161,11 +176,13 @@
             border-radius: 12px;
         }
         
-        .progress-fill.danger { background: var(--danger); }
-        .progress-fill.break { background: var(--break-color); }
+        .progress-fill.danger { background: var(--danger);
+        }
+        .progress-fill.break { background: var(--break-color);
+        }
         
         #progressPercent {
-            font-size: 32px; 
+            font-size: 32px;
             color: #e5e7eb;
             font-weight: 800;
             font-family: inherit;
@@ -176,32 +193,50 @@
         }
         /* -------------------------------- */
 
-        .pill { display: inline-block; padding: 6px 12px; border-radius: 999px; font-size: 14px; border: 1px solid #334155 }
-        .tomorrow-mode-text { color: var(--warn) !important; font-weight: bold; }
-        .tomorrow-pill { border-color: var(--warn) !important; color: var(--warn) !important; }
-        .status-break { color: var(--break-color); font-weight: 700; }
-        .status-warn { color: var(--danger); animation: pulse 1s infinite; }
+        .pill { display: inline-block;
+          padding: 6px 12px; border-radius: 999px; font-size: 14px; border: 1px solid #334155 }
+        .tomorrow-mode-text { color: var(--warn) !important;
+          font-weight: bold; }
+        .tomorrow-pill { border-color: var(--warn) !important; color: var(--warn) !important;
+        }
+        .status-break { color: var(--break-color); font-weight: 700;
+        }
+        .status-warn { color: var(--danger); animation: pulse 1s infinite;
+        }
         @keyframes pulse { 0%{opacity:1} 50%{opacity:0.8} 100%{opacity:1} }
 
         /* --- SCHEDULE TABLE --- */
-        table { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 10px; table-layout: fixed; }
-        th, td { border-bottom: 1px solid #1f2937; padding: 12px 6px; vertical-align: middle; }
-        th:nth-child(1), td:nth-child(1) { width: 160px; color: var(--accent); }
-        th:nth-child(2), td:nth-child(2) { text-align: left; }
+        table { width: 100%;
+          border-collapse: collapse; font-size: 15px; margin-top: 10px; table-layout: fixed; }
+        th, td { border-bottom: 1px solid #1f2937;
+          padding: 12px 6px; vertical-align: middle; }
+        th:nth-child(1), td:nth-child(1) { width: 160px; color: var(--accent);
+        }
+        th:nth-child(2), td:nth-child(2) { text-align: left;
+        }
 
-        th { color: #94a3b8; text-align: left; font-weight: 600; font-size: 13px }
-        .time { color: #a5b4fc; white-space: nowrap }
-        .subject { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        th { color: #94a3b8; text-align: left; font-weight: 600;
+          font-size: 13px }
+        .time { color: #a5b4fc;
+          white-space: nowrap }
+        .subject { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
         .small { font-size: 13px }
 
-        .row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap }
-        .flexcol { display: flex; flex-direction: column; gap: 8px }
+        .row { display: flex;
+          gap: 16px; align-items: center; flex-wrap: wrap }
+        .flexcol { display: flex; flex-direction: column;
+          gap: 8px }
 
-        .content { flex: 1; display: flex; flex-direction: column; overflow: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; overflow: visible;
+        }
         
-        .schedule-card { flex: none; display: flex; flex-direction: column; margin-top: 20px; max-height: none; height: auto; }
+        .schedule-card { flex: none;
+          display: flex; flex-direction: column; margin-top: 20px; max-height: none; height: auto;
+        }
         .schedule-card > div:first-child { margin-bottom: 10px }
-        .schedule-card > div:last-child { flex: 1; overflow: visible; }
+        .schedule-card > div:last-child { flex: 1;
+          overflow: visible; }
 
         .edit-input {
           width: 100%;
@@ -218,15 +253,25 @@
           flex-direction: column;
           padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom) 20px;
         }
-        #fullscreenLayer.active { display: flex; }
-        .fs-section-top { flex: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .fs-section-bottom { flex: 40; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 0 40px; gap: 20px; }
-        .fs-row { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%; }
-        .fs-clock { position: absolute; top: 10px; left: 10px; font-size: 18px; color: #64748b; font-weight: 500; }
-        .fs-countdown { font-size: 28vh; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; text-align: center; }
-        .fs-info-label { font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px;}
-        .fs-info-main { font-size: 28px; font-weight: 700; line-height: 1.1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 90%; }
-        .fs-info-sub { font-size: 20px; color: var(--muted); margin-top: 2px; }
+        #fullscreenLayer.active { display: flex;
+        }
+        .fs-section-top { flex: 60; display: flex; flex-direction: column; align-items: center; justify-content: center;
+          position: relative; }
+        .fs-section-bottom { flex: 40; display: flex; flex-direction: column; align-items: center;
+          justify-content: flex-start; padding: 0 40px; gap: 20px; }
+        .fs-row { display: flex;
+          flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%;
+        }
+        .fs-clock { position: absolute; top: 10px; left: 10px; font-size: 18px; color: #64748b;
+          font-weight: 500; }
+        .fs-countdown { font-size: 28vh; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums;
+          text-align: center; }
+        .fs-info-label { font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: 1px;
+          margin-bottom: 2px;}
+        .fs-info-main { font-size: 28px; font-weight: 700; line-height: 1.1; overflow: hidden;
+          white-space: nowrap; text-overflow: ellipsis; max-width: 90%; }
+        .fs-info-sub { font-size: 20px; color: var(--muted);
+          margin-top: 2px; }
         .fs-button {
           position: absolute;
           top: 10px; right: 10px; padding: 8px 16px; font-size: 16px; background: #334155; border: 1px solid #64748b; border-radius: 8px; cursor: pointer;
@@ -264,7 +309,9 @@
             text-align: right;
         }
 
-        #testModeBadge { display: none; background: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 8px; vertical-align: middle; text-transform: uppercase; }
+        #testModeBadge { display: none; background: #ef4444; color: white; padding: 2px 8px;
+          border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 8px; vertical-align: middle; text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -292,16 +339,7 @@
             <button id="autoSetBtn" onclick="activateAutoMode()">✨ Auto Set Day</button>
             <div style="border-top:1px solid #334155; margin-bottom:12px"></div>
 
-            <div style="font-size:12px; color:#94a3b8;">School Clock Sync (Offset)</div>
-            <div class="sync-group">
-                <button onclick="adjustTime(-10000)">-10s</button>
-                <button onclick="adjustTime(-1000)">-1s</button>
-                <span id="offsetDisplay" class="offset-display">+0s</span>
-                <button onclick="adjustTime(1000)">+1s</button>
-                <button onclick="adjustTime(10000)">+10s</button>
-            </div>
-            
-            <div style="border-top:1px solid #334155;"></div>
+            <span id="offsetDisplay" style="display:none;"></span>
 
             <div style="font-size:12px; color:#f59e0b;">🧪 Test Mode (Time Travel)</div>
             <div class="test-group">
@@ -413,7 +451,7 @@
 <script>
 // --- CONFIG DATA ---
 const configData = {
-  "settings": { "defaultOffsetSeconds": -39, "timeZone": "Asia/Hong_Kong" },
+  "settings": { "defaultOffsetSeconds": -42, "timeZone": "Asia/Hong_Kong" },
   "calendar": {
     "2025-9-2":1,"2025-9-3":2,"2025-9-4":3,"2025-9-5":4,"2025-9-8":5,"2025-9-9":6,"2025-9-10":1,"2025-9-11":2,"2025-9-12":3,"2025-9-15":4,"2025-9-16":5,"2025-9-17":6,"2025-9-18":1,"2025-9-19":2,"2025-9-22":3,"2025-9-23":4,"2025-9-24":5,"2025-9-25":6,"2025-9-29":1,"2025-9-30":2,
     "2025-10-6":3,"2025-10-8":4,"2025-10-9":5,"2025-10-10":6,"2025-10-13":1,"2025-10-14":2,"2025-10-15":3,"2025-10-16":4,"2025-10-17":5,"2025-10-20":6,"2025-10-21":1,"2025-10-22":2,"2025-10-23":3,"2025-10-28":4,"2025-10-30":5,"2025-10-31":6,
@@ -463,6 +501,7 @@ const configData = {
      "day4":"Chinese Language", "day5":"English Language", "day6":"Chinese Language"}
   ]
 };
+
 // --- LOGIC FROM script.js ---
 
 // Global variables
@@ -479,6 +518,7 @@ const settingsPanel = document.getElementById('settingsPanel');
 const dayPicker = document.getElementById('dayPicker');
 const autoBtn = document.getElementById('autoSetBtn');
 const pill = document.getElementById('activeDayPill');
+
 // State Variables
 let currentDay = 1;
 let isEditMode = false;
@@ -497,8 +537,9 @@ function init() {
       const defaultOffsetSec = config.settings.defaultOffsetSeconds;
 
       periods = JSON.parse(localStorage.getItem('lessonTimer_data') || JSON.stringify(defaultPeriods));
-      const savedOffset = localStorage.getItem('lessonTimer_offset');
-      timeOffset = savedOffset !== null ? parseInt(savedOffset, 10) : (defaultOffsetSec * 1000);
+      
+      // Force offset to be strictly the default offset (ignoring local storage)
+      timeOffset = defaultOffsetSec * 1000;
 
       const storedDay = localStorage.getItem('lessonTimer_day');
       currentDay = storedDay ? parseInt(storedDay) : 1;
@@ -537,7 +578,6 @@ function startApp() {
 // --- LOOP SYSTEM FOR STOPWATCH MODE ---
 function tick() {
     updateInfo();
-    
     if(isFullscreen) {
         // High Speed Mode (Stopwatch)
         loopId = requestAnimationFrame(tick);
@@ -649,7 +689,10 @@ function disableTestMode() {
 function updateOffsetDisplay(){
   const s = timeOffset / 1000;
   const sign = s >= 0 ? '+' : '';
-  document.getElementById('offsetDisplay').textContent = `${sign}${s}s`;
+  const displayElement = document.getElementById('offsetDisplay');
+  if (displayElement) {
+      displayElement.textContent = `${sign}${s}s`;
+  }
 }
 
 function parseHM(hm){
@@ -672,7 +715,8 @@ function diffFmtMs(ms){
   const s = Math.floor(ms/1000);
   const m = Math.floor(s/60);
   const sec = s % 60;
-  const centi = Math.floor((ms % 1000) / 10); // Get centiseconds (0-99)
+  const centi = Math.floor((ms % 1000) / 10);
+  // Get centiseconds (0-99)
   return `${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}.${centi.toString().padStart(2,'0')}`;
 }
 
@@ -842,10 +886,8 @@ function updateInfo(){
   const { current, nextEvent, nextLesson, countdownTo } = analyze(currentDay);
   const t = nowHK();
   const timeLeft = countdownTo ? countdownTo - t : 0;
-  
   // Choose format based on mode
   const timeStr = isFullscreen ? diffFmtMs(timeLeft) : diffFmt(timeLeft);
-  
   const clockStr = t.toLocaleString('en-US', { weekday:'short', hour:'2-digit', minute:'2-digit', second:'2-digit' });
   
   const mainStatusLabel = document.getElementById('mainStatusLabel');
@@ -853,7 +895,6 @@ function updateInfo(){
   const nowSt = document.getElementById('nowStatus');
   const bar = document.getElementById('lessonProgressBar');
   const pctText = document.getElementById('progressPercent');
-  
   // --- PROGRESS BAR & PERCENT LOGIC ---
   if(current && countdownTo && !isTomorrowView) {
       const totalDuration = current.end - current.start;
@@ -861,17 +902,18 @@ function updateInfo(){
       let pct = (elapsed / totalDuration) * 100;
       if (pct < 0) pct = 0; if (pct > 100) pct = 100;
       
-      const pctFixed = pct.toFixed(2); // 2 Decimals for Fullscreen
+      const pctFixed = pct.toFixed(2);
+      // 2 Decimals for Fullscreen
 
       bar.style.width = `${pct}%`;
       pctText.textContent = `${Math.floor(pct)}%`;
-      
       // Fullscreen Update
       const fsBar = document.getElementById('fsProgressBar');
       const fsText = document.getElementById('fsProgressPercent');
       if(fsBar && fsText){
           fsBar.style.width = `${pct}%`;
-          fsText.textContent = `${pctFixed}%`; // Show decimals here
+          fsText.textContent = `${pctFixed}%`;
+          // Show decimals here
           
           if(timeLeft < 60000) fsBar.style.backgroundColor = 'var(--danger)';
           else if(current.type === 'event') fsBar.style.backgroundColor = 'var(--break-color)';
@@ -890,7 +932,8 @@ function updateInfo(){
       
       const fsBar = document.getElementById('fsProgressBar');
       const fsText = document.getElementById('fsProgressPercent');
-      if(fsBar && fsText){ fsBar.style.width = '0%'; fsText.textContent = ''; }
+      if(fsBar && fsText){ fsBar.style.width = '0%'; fsText.textContent = '';
+      }
   }
   // ------------------------------------
 
@@ -900,7 +943,6 @@ function updateInfo(){
       mainStatusLabel.classList.add('tomorrow-mode-text');
       nowSt.innerHTML = `<span class="tomorrow-mode-text">Day ${currentDay}</span>`;
       document.getElementById('nowDetail').textContent = "Pack your bags for this schedule";
-      
       scheduleLabel.innerHTML = `TOMORROW'S SCHEDULE`;
       scheduleLabel.classList.add('tomorrow-mode-text');
       document.getElementById('countdown').textContent = "--:--";
@@ -925,7 +967,8 @@ function updateInfo(){
          
          const fsBar = document.getElementById('fsProgressBar');
          const fsText = document.getElementById('fsProgressPercent');
-         if(fsBar && fsText){ fsBar.style.width='0%'; fsText.textContent=''; }
+         if(fsBar && fsText){ fsBar.style.width='0%'; fsText.textContent='';
+         }
       }
       return;
   } 
@@ -999,7 +1042,8 @@ function updateInfo(){
   document.getElementById('clock').textContent = clockStr;
   if(current) {
       nowSt.innerHTML = current.type === "class" 
-        ? `<span class="now">${current.subject}</span>` 
+        ?
+        `<span class="now">${current.subject}</span>` 
         : `<span class="status-break">${current.subject}</span>`;
       document.getElementById('nowDetail').textContent = `${current.rawStart}–${current.rawEnd}`;
   } else { 
@@ -1013,7 +1057,8 @@ function updateInfo(){
   }
 
   document.getElementById('nextEvent').textContent = nextEvent ? (nextEvent.display || nextEvent.subject) : '—';
-  document.getElementById('nextEventTime').textContent = nextEvent ? `${nextEvent.rawStart}–${nextEvent.rawEnd}` : '';
+  document.getElementById('nextEventTime').textContent = nextEvent ?
+    `${nextEvent.rawStart}–${nextEvent.rawEnd}` : '';
   document.getElementById('nextLesson').textContent = nextLesson ? nextLesson.subject : '—';
   document.getElementById('nextLessonTime').textContent = nextLesson ? `${nextLesson.rawStart}–${nextLesson.rawEnd}` : '';
   const dbl = document.getElementById('doubleLesson');
@@ -1038,25 +1083,22 @@ function updateInfo(){
 function enterFullscreen(){ 
     isFullscreen = true; 
     fsLayer.classList.add('active'); 
-    app.style.display = 'none'; 
-    
+    app.style.display = 'none';
     // Clear any existing timeout loop
     if(loopId) clearTimeout(loopId);
     if(loopId) cancelAnimationFrame(loopId);
-    
     // Restart loop immediately (High speed)
     tick(); 
 }
 
 function exitFullscreen(){ 
     isFullscreen = false; 
-    fsLayer.classList.remove('active'); 
+    fsLayer.classList.remove('active');
     app.style.display = 'flex'; 
     
     // Clear any existing RAF loop
     if(loopId) cancelAnimationFrame(loopId);
     if(loopId) clearTimeout(loopId);
-    
     // Restart loop immediately (Normal speed)
     tick(); 
 }
