@@ -64,14 +64,14 @@ header {
 header h1 {
     font-size: 1.4rem;
     margin: 0;
-    font-weight: 600;
+    font-weight: 600
 }
 
 .controls {
     display: flex;
     gap: 8px;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: wrap
 }
 
 #settingsPanel {
@@ -108,7 +108,7 @@ input[type="time"] {
 }
 
 button:active {
-    background: #334155;
+    background: #334155
 }
 
 .primary-btn {
@@ -178,12 +178,12 @@ button:active {
     display: grid;
     grid-template-columns: 1fr;
     gap: 16px;
-    flex: 1;
+    flex: 1
 }
 
 @media (min-width: 800px) {
     .grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(3, 1fr)
     }
 }
 
@@ -215,7 +215,7 @@ button:active {
 
 .value {
     font-size: 20px;
-    font-weight: 600;
+    font-weight: 600
 }
 
 .countdown {
@@ -274,12 +274,14 @@ button:active {
     text-align: right;
 }
 
+/* -------------------------------- */
+
 .pill {
     display: inline-block;
     padding: 6px 12px;
     border-radius: 999px;
     font-size: 14px;
-    border: 1px solid #334155;
+    border: 1px solid #334155
 }
 
 .tomorrow-mode-text {
@@ -304,15 +306,15 @@ button:active {
 
 @keyframes pulse {
     0% {
-        opacity: 1;
+        opacity: 1
     }
 
     50% {
-        opacity: 0.8;
+        opacity: 0.8
     }
 
     100% {
-        opacity: 1;
+        opacity: 1
     }
 }
 
@@ -347,12 +349,12 @@ th {
     color: #94a3b8;
     text-align: left;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 13px
 }
 
 .time {
     color: #a5b4fc;
-    white-space: nowrap;
+    white-space: nowrap
 }
 
 .subject {
@@ -363,20 +365,20 @@ th {
 }
 
 .small {
-    font-size: 13px;
+    font-size: 13px
 }
 
 .row {
     display: flex;
     gap: 16px;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: wrap
 }
 
 .flexcol {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 8px
 }
 
 .content {
@@ -396,7 +398,7 @@ th {
 }
 
 .schedule-card>div:first-child {
-    margin-bottom: 10px;
+    margin-bottom: 10px
 }
 
 .schedule-card>div:last-child {

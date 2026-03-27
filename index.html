@@ -4,18 +4,22 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+
     <meta name="theme-color" content="#0b1220">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <title>Lesson Timer + Percentage</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
     <div class="app" id="normalView">
         <header>
             <h1>Time Left <span id="testModeBadge">Test Mode</span></h1>
             <div class="controls">
                 <span class="pill"><span id="clock">Loading...</span></span>
+
                 <select id="dayPicker">
                     <option value="1">Day 1</option>
                     <option value="2">Day 2</option>
@@ -24,13 +28,17 @@
                     <option value="5">Day 5</option>
                     <option value="6">Day 6</option>
                 </select>
+
                 <button id="toggleSettingsBtn">⚙️ Settings</button>
                 <button id="fullscreenBtn">Fullscreen</button>
+
                 <div id="settingsPanel">
                     <div style="font-size:12px; color:#22c55e; margin-bottom:4px">Calendar Automation</div>
                     <button id="autoSetBtn" onclick="activateAutoMode()">✨ Auto Set Day</button>
                     <div style="border-top:1px solid #334155; margin-bottom:12px"></div>
+
                     <span id="offsetDisplay" style="display:none;"></span>
+
                     <div style="font-size:12px; color:#f59e0b;">🧪 Test Mode (Time Travel)</div>
                     <div class="test-group">
                         <input type="time" id="testTimeInput">
@@ -38,7 +46,9 @@
                     </div>
                     <button onclick="disableTestMode()" id="resetTestBtn"
                         style="display:none; width:100%; margin-top:4px">Reset to Real Time</button>
+
                     <div style="border-top:1px solid #334155;"></div>
+
                     <div style="font-size:12px; color:#94a3b8;">Data Management</div>
                     <button onclick="toggleEditMode()" id="editModeBtn">✏️ Edit Subject Names</button>
                     <div style="display:flex; gap:8px">
@@ -65,6 +75,7 @@
                                 style="display:none; color:var(--ok); margin-top:4px"></div>
                         </div>
                     </div>
+
                     <div class="progress-row">
                         <div class="progress-track">
                             <div id="lessonProgressBar" class="progress-fill"></div>
@@ -72,17 +83,20 @@
                         <div id="progressPercent"></div>
                     </div>
                 </div>
+
                 <div class="card">
                     <span class="label">Next Event</span>
                     <div id="nextEvent" class="value">—</div>
                     <div id="nextEventTime" class="small muted">—</div>
                 </div>
+
                 <div class="card">
                     <span class="label">Next Lesson</span>
                     <div id="nextLesson" class="value">—</div>
                     <div id="nextLessonTime" class="small muted">—</div>
                 </div>
             </div>
+
             <div class="card schedule-card">
                 <div class="row" style="justify-content:space-between">
                     <div class="label" id="scheduleLabel">Today’s Schedule <span id="editIndicator"
@@ -110,6 +124,7 @@
             <button class="fs-button" id="fsExitBtn">Exit</button>
             <div class="fs-countdown" id="fsCountdown">--:--</div>
         </div>
+
         <div class="fs-section-bottom">
             <div class="fs-progress-container">
                 <div class="fs-progress-track">
@@ -117,11 +132,13 @@
                 </div>
                 <div id="fsProgressPercent"></div>
             </div>
+
             <div class="fs-row" id="fsCurrentBlock">
                 <div class="fs-info-label" id="fsCurrentLabel">Now</div>
                 <div class="fs-info-main" id="fsCurrentSubject">...</div>
                 <div class="fs-info-sub" id="fsCurrentTime">...</div>
             </div>
+
             <div class="fs-row" id="fsNextBlock">
                 <div class="fs-info-label" id="fsNextLabel">Next</div>
                 <div class="fs-info-main" id="fsNextSubject">...</div>
@@ -130,7 +147,6 @@
         </div>
     </div>
 
-    <script src="timetable.json"></script>
     <script src="script.js"></script>
 </body>
 
