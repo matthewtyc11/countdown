@@ -1,5 +1,3 @@
-// --- LOGIC FROM script.js ---
-
 // Global variables
 let calendarData = {};
 let defaultPeriods = [];
@@ -17,31 +15,29 @@ const pill = document.getElementById('activeDayPill');
 
 // State Variables
 let currentDay = 1;
-let isEditMode = false;
 let isFullscreen = false;
 let testModeOffset = null;
 let isTomorrowView = false;
 let isAutoMode = true;
 let loopId = null;
 
-// 1. INITIALIZE (UPDATED TO FETCH JSON)
+// 1. INITIALIZE (FORCED JSON LOADING)
 async function init() {
     try {
         const response = await fetch('timetable_store.json');
         const configData = await response.json();
 
         calendarData = configData.calendar;
+        
+        // FORCE the app to use JSON data every time, ignoring previous edits in localStorage
         defaultPeriods = configData.defaultPeriods;
+        periods = JSON.parse(JSON.stringify(defaultPeriods));
 
         if (configData.settings && configData.settings.timeZone) {
             tz = configData.settings.timeZone;
         }
         const defaultOffset = (configData.settings && configData.settings.defaultOffsetSeconds !== undefined)
             ? configData.settings.defaultOffsetSeconds * 1000 : 0;
-
-        const savedData = localStorage.getItem('lessonTimer_data');
-        if (savedData) periods = JSON.parse(savedData);
-        else periods = JSON.parse(JSON.stringify(defaultPeriods));
 
         const savedDay = localStorage.getItem('lessonTimer_day');
         if (savedDay) currentDay = Number(savedDay);
@@ -79,18 +75,15 @@ function startApp() {
     document.getElementById('fsExitBtn').onclick = exitFullscreen;
 
     populateTable(currentDay);
-    // Start Loop
     tick();
 }
 
-// --- LOOP SYSTEM FOR STOPWATCH MODE ---
+// --- LOOP SYSTEM ---
 function tick() {
     updateInfo();
     if (isFullscreen) {
-        // High Speed Mode (Stopwatch)
         loopId = requestAnimationFrame(tick);
     } else {
-        // Normal Mode (1s)
         loopId = setTimeout(tick, 1000);
     }
 }
@@ -98,11 +91,8 @@ function tick() {
 // --- LOGIC FUNCTIONS ---
 function getRealTimeHK() {
     const now = new Date();
-    // 1. Get the string in HK time
     const str = now.toLocaleString('en-US', { timeZone: tz });
-    // 2. Parse it (this loses ms)
     const d = new Date(str);
-    // 3. Add local ms back (assuming synced seconds)
     d.setMilliseconds(now.getMilliseconds());
     return new Date(d.getTime() + timeOffset);
 }
@@ -141,10 +131,6 @@ function checkAutoDate() {
         localStorage.setItem('lessonTimer_day', currentDay);
         populateTable(currentDay);
         updateInfo();
-    } else {
-        if (isTomorrowView && !autoDay) {
-            isTomorrowView = false;
-        }
     }
 }
 
@@ -156,13 +142,6 @@ function updateAutoButtonUI() {
         autoBtn.classList.remove('active-auto');
         autoBtn.textContent = "✨ Auto Set Day";
     }
-}
-
-function adjustTime(diff) {
-    timeOffset += diff;
-    localStorage.setItem('lessonTimer_offset', timeOffset);
-    updateOffsetDisplay();
-    updateInfo();
 }
 
 function enableTestMode() {
@@ -212,13 +191,12 @@ function diffFmt(ms) {
     return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
 }
 
-// NEW FUNCTION FOR FULLSCREEN STOPWATCH
 function diffFmtMs(ms) {
     if (ms <= 0) return '00:00.00';
     const s = Math.floor(ms / 1000);
     const m = Math.floor(s / 60);
     const sec = s % 60;
-    const centi = Math.floor((ms % 1000) / 10); // Get centiseconds (0-99)
+    const centi = Math.floor((ms % 1000) / 10);
     return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}.${centi.toString().padStart(2, '0')}`;
 }
 
@@ -270,51 +248,11 @@ function getCombinedLesson(period, schedule) {
     return combined;
 }
 
-function toggleEditMode() {
-    isEditMode = !isEditMode;
-    const btn = document.getElementById('editModeBtn');
-    const ind = document.getElementById('editIndicator');
-    if (isEditMode) {
-        btn.textContent = "💾 Save Subjects";
-        btn.classList.add('primary-btn');
-        ind.style.display = 'inline';
-        populateTable(currentDay);
-    } else {
-        saveFromTable();
-        btn.textContent = "✏️ Edit Subject Names";
-        btn.classList.remove('primary-btn');
-        ind.style.display = 'none';
-        populateTable(currentDay);
-        updateInfo();
-    }
-}
-
-function saveFromTable() {
-    const inputs = document.querySelectorAll('.edit-input');
-    inputs.forEach(inp => {
-        const index = parseInt(inp.getAttribute('data-index'));
-        const newVal = inp.value;
-        const p = periods[index];
-        if (p.type === 'class') p[`day${currentDay}`] = newVal;
-        else p.display = newVal;
-    });
-    localStorage.setItem('lessonTimer_data', JSON.stringify(periods));
-    localStorage.setItem('lessonTimer_day', currentDay);
-}
-
-function resetData() {
-    if (confirm("Reset all subjects and return settings to default?")) {
-        localStorage.clear();
-        location.reload();
-    }
-}
-
 function closeSettings() {
     settingsPanel.classList.remove('show');
 }
 
 function setDay() {
-    if (isEditMode) saveFromTable();
     if (isAutoMode) {
         isAutoMode = false;
         localStorage.setItem('lessonTimer_isAuto', 'false');
@@ -334,11 +272,7 @@ function populateTable(day) {
 
     sched.forEach(r => {
         const tr = document.createElement('tr');
-        if (isEditMode) {
-            tr.innerHTML = `<td class="time">${r.rawStart}</td><td><input class="edit-input" data-index="${r.index}" value="${r.subject}" /></td>`;
-        } else {
-            tr.innerHTML = `<td class="time">${r.rawStart}–${r.rawEnd}</td><td class="subject">${r.subject}</td>`;
-        }
+        tr.innerHTML = `<td class="time">${r.rawStart}–${r.rawEnd}</td><td class="subject">${r.subject}</td>`;
         tbody.appendChild(tr);
     });
 
@@ -394,7 +328,6 @@ function updateInfo() {
     const { current, nextEvent, nextLesson, countdownTo } = analyze(currentDay);
 
     const timeLeft = countdownTo ? countdownTo - t : 0;
-    // Choose format based on mode
     const timeStr = isFullscreen ? diffFmtMs(timeLeft) : diffFmt(timeLeft);
     const clockStr = t.toLocaleString('en-US', { weekday: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
@@ -404,24 +337,22 @@ function updateInfo() {
     const bar = document.getElementById('lessonProgressBar');
     const pctText = document.getElementById('progressPercent');
 
-    // --- PROGRESS BAR & PERCENT LOGIC ---
     if (current && countdownTo && !isTomorrowView) {
         const totalDuration = current.end - current.start;
         const elapsed = t - current.start;
         let pct = (elapsed / totalDuration) * 100;
         if (pct < 0) pct = 0;
         if (pct > 100) pct = 100;
-        const pctFixed = pct.toFixed(2); // 2 Decimals for Fullscreen
+        const pctFixed = pct.toFixed(2);
 
         bar.style.width = `${pct}%`;
         pctText.textContent = `${Math.floor(pct)}%`;
 
-        // Fullscreen Update
         const fsBar = document.getElementById('fsProgressBar');
         const fsText = document.getElementById('fsProgressPercent');
         if (fsBar && fsText) {
             fsBar.style.width = `${pct}%`;
-            fsText.textContent = `${pctFixed}%`; // Show decimals here
+            fsText.textContent = `${pctFixed}%`;
 
             if (timeLeft < 60000) fsBar.style.backgroundColor = 'var(--danger)';
             else if (current.type === 'event') fsBar.style.backgroundColor = 'var(--break-color)';
@@ -445,7 +376,6 @@ function updateInfo() {
         }
     }
 
-    // ------------------------------------
     if (isTomorrowView) {
         document.getElementById('clock').textContent = clockStr;
         mainStatusLabel.textContent = "PREVIEWING TOMORROW";
@@ -478,8 +408,7 @@ function updateInfo() {
         return;
     }
 
-    // Normal view logic (Not tomorrow)
-    scheduleLabel.innerHTML = `Today’s Schedule <span id="editIndicator" style="color:var(--warn);display:${isEditMode ? 'inline' : 'none'}">(Editing)</span>`;
+    scheduleLabel.innerHTML = `Today’s Schedule`;
     scheduleLabel.classList.remove('tomorrow-mode-text');
 
     document.getElementById('clock').textContent = clockStr;
@@ -596,10 +525,8 @@ function enterFullscreen() {
     isFullscreen = true;
     fsLayer.classList.add('active');
     app.style.display = 'none';
-    // Clear any existing timeout loop
     if (loopId) clearTimeout(loopId);
     if (loopId) cancelAnimationFrame(loopId);
-    // Restart loop immediately (High speed)
     tick();
 }
 
@@ -607,10 +534,7 @@ function exitFullscreen() {
     isFullscreen = false;
     fsLayer.classList.remove('active');
     app.style.display = 'flex';
-
-    // Clear any existing RAF loop
     if (loopId) cancelAnimationFrame(loopId);
     if (loopId) clearTimeout(loopId);
-
     tick();
 }
