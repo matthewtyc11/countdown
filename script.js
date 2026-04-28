@@ -44,11 +44,6 @@ async function init() {
 
         const savedAuto = localStorage.getItem('lessonTimer_isAuto');
         if (savedAuto !== null) isAutoMode = savedAuto === 'true';
-
-        const savedOffset = localStorage.getItem('lessonTimer_offset');
-        if (savedOffset !== null) timeOffset = Number(savedOffset);
-        else timeOffset = defaultOffset;
-
         startApp();
     } catch (error) {
         console.error('Failed to load JSON config:', error);
