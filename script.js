@@ -36,7 +36,7 @@ async function init() {
         if (configData.settings && configData.settings.timeZone) {
             tz = configData.settings.timeZone;
         }
-        const timeOffset = (configData.settings && configData.settings.defaultOffsetSeconds !== undefined)
+        timeOffset = (configData.settings && configData.settings.defaultOffsetSeconds !== undefined)
             ? configData.settings.defaultOffsetSeconds * 1000 : 0;
 
         const savedDay = localStorage.getItem('lessonTimer_day');
