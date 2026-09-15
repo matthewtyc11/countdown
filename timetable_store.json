@@ -13,56 +13,57 @@
     "2026-6-1": 3, "2026-6-2": 4, "2026-6-3": 5, "2026-6-4": 6, "2026-6-5": 1, "2026-6-8": 2, "2026-6-9": 3, "2026-6-10": 4, "2026-6-11": 5, "2026-6-12": 6, "2026-6-15": 1, "2026-6-16": 2, "2026-6-17": 3, "2026-6-18": 4, "2026-6-22": 5, "2026-6-23": 6, "2026-6-24": 1, "2026-6-25": 2, "2026-6-26": 3, "2026-6-29": 4, "2026-6-30": 5,
     "2026-7-2": 6, "2026-7-3": 1
   },
-  "defaultPeriods": [
-    { "start": "08:00", "end": "08:20", "display": "Morning Devotion", "type": "event" },
-    {
-      "start": "08:20", "end": "08:55", "display": "Period 1", "type": "class",
-      "day1": "Music", "day2": "Chinese Language", "day3": "Mathematics",
-      "day4": "Citizenship, Economics and Society", "day5": "Chemistry", "day6": "English Language"
-    },
-    {
-      "start": "08:55", "end": "09:30", "display": "Period 2", "type": "class",
-      "day1": "Music", "day2": "Chinese Language", "day3": "Mathematics",
-      "day4": "Citizenship, Economics and Society", "day5": "Chemistry", "day6": "English Language"
-    },
-    { "start": "09:30", "end": "09:50", "display": "Recess", "type": "event" },
-    {
-      "start": "09:50", "end": "10:25", "display": "Period 3", "type": "class",
-      "day1": "Chinese Language", "day2": "Geography", "day3": "Geography",
-      "day4": "Putonghua", "day5": "English Language", "day6": "Physical Education Lessons"
-    },
-    {
-      "start": "10:25", "end": "11:00", "display": "Period 4", "type": "class",
-      "day1": "Chinese Language", "day2": "Geography", "day3": "Geography",
-      "day4": "Chinese Language", "day5": "English Language", "day6": "Physical Education Lessons"
-    },
-    { "start": "11:00", "end": "11:15", "display": "Recess", "type": "event" },
-    { "start": "11:15", "end": "11:35", "display": "Reading time", "type": "event" },
-    {
-      "start": "11:35", "end": "12:10", "display": "Period 5", "type": "class",
-      "day1": "Mathematics", "day2": "English Language", "day3": "Assembly",
-      "day4": "Chemistry", "day5": "Visual Arts", "day6": "Chinese Language"
-    },
-    {
-      "start": "12:10", "end": "12:45", "display": "Period 6", "type": "class",
-      "day1": "Mathematics", "day2": "English Language", "day3": "Assembly",
-      "day4": "Chemistry", "day5": "Visual Arts", "day6": "Chinese Language"
-    },
-    { "start": "12:45", "end": "13:50", "display": "Lunch", "type": "event" },
-    {
-      "start": "13:55", "end": "14:30", "display": "Period 7", "type": "class",
-      "day1": "Home Economics", "day2": "Mathematics", "day3": "Ethics/Religious Education",
-      "day4": "Geography", "day5": "Chinese Language", "day6": "Mathematics"
-    },
-    {
-      "start": "14:30", "end": "15:05", "display": "Period 8", "type": "class",
-      "day1": "Home Economics", "day2": "Chemistry", "day3": "English Language",
-      "day4": "English Language/Mathematics", "day5": "Chinese Language", "day6": "Computer Literacy"
-    },
-    {
-      "start": "15:05", "end": "15:40", "display": "Period 9", "type": "class",
-      "day1": "Home Economics", "day2": "Chemistry", "day3": "English Language",
-      "day4": "English Language/Mathematics", "day5": "Computer Literacy", "day6": "Computer Literacy"
-    }
-  ]
+"defaultPeriods": [
+  { "start": "08:00", "end": "08:20", "display": "Morning Devotion", "type": "event" },
+  {
+    "start": "08:20", "end": "08:55", "display": "Period 1", "type": "class",
+    "day1": "Chinese Language", "day2": "Visual Arts", "day3": "Physical Education Lessons",
+    "day4": "Citizenship, Economics and Society", "day5": "Mathematics", "day6": "English Language"
+  },
+  {
+    "start": "08:55", "end": "09:30", "display": "Period 2", "type": "class",
+    "day1": "Chinese Language", "day2": "Visual Arts", "day3": "Physical Education Lessons",
+    "day4": "Citizenship, Economics and Society", "day5": "Mathematics", "day6": "English Language"
+  },
+  { "start": "09:30", "end": "09:50", "display": "Recess", "type": "event" },
+  {
+    "start": "09:50", "end": "10:25", "display": "Period 3", "type": "class",
+    "day1": "History", "day2": "Mathematics", "day3": "Ethics/ Religious Education",
+    "day4": "Biology", "day5": "Chemistry", "day6": "Chinese Language"
+  },
+  {
+    "start": "10:25", "end": "11:00", "display": "Period 4", "type": "class",
+    "day1": "History", "day2": "Mathematics", "day3": "Music",
+    "day4": "Biology", "day5": "Chemistry", "day6": "Chinese Language"
+  },
+  { "start": "11:00", "end": "11:15", "display": "Recess", "type": "event" },
+  { "start": "11:15", "end": "11:35", "display": "Reading time", "type": "event" },
+  {
+    "start": "11:35", "end": "12:10", "display": "Period 5", "type": "class",
+    "day1": "English Language", "day2": "English Language", "day3": "Assembly",
+    "day4": "Physics", "day5": "English Language", "day6": "Chinese History"
+  },
+  {
+    "start": "12:10", "end": "12:45", "display": "Period 6", "type": "class",
+    "day1": "English Language", "day2": "English Language", "day3": "Assembly",
+    "day4": "Physics", "day5": "English Language", "day6": "Chinese History"
+  },
+  { "start": "12:45", "end": "13:50", "display": "Lunch", "type": "event" },
+  {
+    "start": "13:55", "end": "14:30", "display": "Period 7", "type": "class",
+    "day1": "Business, Accounting & Financial Studies", "day2": "Chinese Language", "day3": "Geography",
+    "day4": "Chinese Language", "day5": "Physics", "day6": "Mathematics"
+  },
+  {
+    "start": "14:30", "end": "15:05", "display": "Period 8", "type": "class",
+    "day1": "Business, Accounting & Financial Studies", "day2": "Geography", "day3": "English Language",
+    "day4": "Chinese Language", "day5": "Chinese Language", "day6": "Computer Literacy"
+  },
+  {
+    "start": "15:05", "end": "15:40", "display": "Period 9", "type": "class",
+    "day1": "Mathematics", "day2": "Geography", "day3": "English Language",
+    "day4": "Mathematics", "day5": "Chinese Language", "day6": "Computer Literacy"
+  }
+]
+
 }
